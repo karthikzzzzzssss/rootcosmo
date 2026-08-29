@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    @apply text-gray-900 bg-white;
+    transition: font-family 0.2s ease;
+  }
+
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-yellow-400 text-black font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition-all duration-200 active:scale-95;
+  }
+
+  .btn-purple {
+    @apply bg-purple-700 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-purple-800 transition-all duration-200 active:scale-95;
+  }
+
+  .nav-link {
+    @apply text-white font-medium text-sm hover:text-yellow-300 transition-colors duration-150 flex items-center gap-0.5;
+  }
+
+  .treatment-card {
+    @apply bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  .section-title {
+    @apply text-base font-bold tracking-widest uppercase border-b-2 border-purple-600 pb-1 inline-block;
+  }
+}
+
+@layer utilities {
+  .purple-gradient {
+    background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #581c87 100%);
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #7c3aed;
+  border-radius: 3px;
+}
+
+/* Horizontal scroll for treatment cards */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}

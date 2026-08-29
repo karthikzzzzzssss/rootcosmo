@@ -1,0 +1,181 @@
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Clock } from 'lucide-react';
+import { useI18n } from '../i18n/I18nContext';
+import { FOOTER_LINKS, FOOTER_SERVICES } from '../i18n/dbTranslations';
+
+const QUICK_LINK_ACTIONS: Record<string, { type: 'category'; slug: string } | { type: 'scroll'; id: string }> = {
+  'About Us':         { type: 'scroll',   id: 'about' },
+  'Dental Services':  { type: 'category', slug: 'dental-care' },
+  'Skin Aesthetics':  { type: 'category', slug: 'face-aesthetics' },
+  'Hair Care':        { type: 'category', slug: 'hair-care' },
+  'Lip Aesthetics':   { type: 'category', slug: 'lip-aesthetics' },
+  'Laser Treatments': { type: 'category', slug: 'laser-treatment' },
+  'MediFacials':      { type: 'category', slug: 'medifacials' },
+  'Gallery':          { type: 'scroll',   id: 'gallery' },
+  'Contact':          { type: 'scroll',   id: 'contact' },
+};
+
+const SERVICE_TREATMENT_NAMES: Record<string, string> = {
+  'Laser Flap Surgeries':  'Laser Flap Surgeries',
+  'Teeth Whitening':       'Teeth Whitening (Bleaching)',
+  'Dental Implants':       'Dental Implants',
+  'Lip Rejuvenation':      'Lip Rejuvenation',
+  'Hydrafacial':           'Hydrafacial',
+  'GFC Treatment':         'GFC (Growth Factor Concentrate) for Hair',
+  'Acne Scars Treatment':  'Acne Scars Treatment',
+  'Skin Tightening':       'Skin Tightening',
+  'Laser Hair Removal':    'Laser Hair Removal',
+};
+
+interface FooterProps {
+  onNavigate: (slug: string) => void;
+  onNavigateTreatment: (name: string) => void;
+}
+
+export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps) {
+  const { t, lang } = useI18n();
+
+  const englishQuickLinks = FOOTER_LINKS.en;
+  const englishServices = FOOTER_SERVICES.en;
+
+  const handleQuickLink = (index: number) => {
+    const action = QUICK_LINK_ACTIONS[englishQuickLinks[index]];
+    if (!action) return;
+    if (action.type === 'category') {
+      onNavigate(action.slug);
+    } else {
+      const el = document.getElementById(action.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleService = (index: number) => {
+    const treatmentName = SERVICE_TREATMENT_NAMES[englishServices[index]];
+    if (treatmentName) onNavigateTreatment(treatmentName);
+  };
+  return (
+    <footer
+      className="text-gray-300 pt-14 pb-6"
+      style={{ background: 'linear-gradient(135deg, #1a0030 0%, #2d0060 100%)' }}
+    >
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 4C14 4 10 9 10 14C10 20 14 24 20 28C26 24 30 20 30 14C30 9 26 4 20 4Z" fill="white" opacity="0.9"/>
+                  <path d="M14 14C14 14 16 20 20 24C24 20 26 14 26 14" stroke="#c026d3" strokeWidth="2" fill="none"/>
+                  <circle cx="20" cy="14" r="3" fill="#c026d3"/>
+                </svg>
+              </div>
+              <div>
+                <span className="text-white font-bold text-lg">Root</span>
+                <span className="text-yellow-400 font-bold text-lg">Cosmo</span>
+              </div>
+            </div>
+            <p className="text-purple-300 text-xs tracking-wide mb-4">
+              {t('navTagline')}
+            </p>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              {t('footerDesc')}
+            </p>
+            <div className="flex gap-3 mt-5">
+              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+                <Facebook size={15} />
+              </a>
+              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+                <Instagram size={15} />
+              </a>
+              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+                <Youtube size={15} />
+              </a>
+            </div>
+          </div>
+
+          {/* Quick links */}
+          <div>
+            <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-5 border-b border-purple-700 pb-2">
+              {t('quickLinks')}
+            </h3>
+            <ul className="space-y-2">
+              {(FOOTER_LINKS[lang] ?? FOOTER_LINKS.en).map((link, i) => (
+                <li key={i}>
+                  <button
+                    onClick={() => handleQuickLink(i)}
+                    className="text-gray-400 text-sm hover:text-yellow-300 transition-colors flex items-center gap-1.5 text-left"
+                  >
+                    <span className="text-purple-500">&rsaquo;</span>
+                    {link}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-5 border-b border-purple-700 pb-2">
+              {t('ourServices')}
+            </h3>
+            <ul className="space-y-2">
+              {(FOOTER_SERVICES[lang] ?? FOOTER_SERVICES.en).map((s, i) => (
+                <li key={i}>
+                  <button
+                    onClick={() => handleService(i)}
+                    className="text-gray-400 text-sm hover:text-yellow-300 transition-colors flex items-center gap-1.5 text-left"
+                  >
+                    <span className="text-purple-500">&rsaquo;</span>
+                    {s}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-5 border-b border-purple-700 pb-2">
+              {t('contactUs')}
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin size={16} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                <p className="text-gray-400 text-sm">{t('hyderabad')}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone size={16} className="text-yellow-400 flex-shrink-0" />
+                <a href="tel:+917842370707" className="text-gray-400 text-sm hover:text-yellow-300 transition-colors">
+                  {t('phone')}
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail size={16} className="text-yellow-400 flex-shrink-0" />
+                <a href="mailto:care@rootcosmo.com" className="text-gray-400 text-sm hover:text-yellow-300 transition-colors">
+                  {t('email')}
+                </a>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock size={16} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div className="text-gray-400 text-sm">
+                  <p>{t('monSatShort')}</p>
+                  <p>{t('sunShort')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-purple-800/60 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+          <p>&copy; {new Date().getFullYear()} {t('allRightsReserved')}</p>
+          <div className="flex gap-4">
+            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('privacyPolicy')}</button>
+            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('termsOfService')}</button>
+            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('sitemap')}</button>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
