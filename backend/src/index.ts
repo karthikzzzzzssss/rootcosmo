@@ -16,7 +16,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
-
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    service: 'RootCosmo API',
+    status: 'ok',
+    health: '/health',
+    api: '/api',
+  });
+});
 // ── Health check ─────────────────────────────────────────
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
