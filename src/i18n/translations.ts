@@ -38,7 +38,7 @@ export type TranslationKey =
   | 'sunShort' | 'hyderabad' | 'bookAppointmentModal' | 'fullName' | 'emailLabel'
   | 'phoneLabel' | 'date' | 'timeSlot' | 'selectTime' | 'treatmentService'
   | 'additionalNotes' | 'confirmAppointment' | 'booking' | 'appointmentBooked'
-  | 'appointmentBookedMsg' | 'close' | 'pleaseFillAll' | 'somethingWrong'
+  | 'appointmentBookedMsg' | 'confirmationEmailUnavailable' | 'close' | 'pleaseFillAll' | 'somethingWrong'
   | 'findServicesByCategory' | 'showingResults' | 'sortByLatest' | 'priceLowHigh'
   | 'nameAZ' | 'loading' | 'yearsExp' | 'patients';
 
@@ -116,6 +116,7 @@ const en: Strings = {
   booking: 'Booking...',
   appointmentBooked: 'Appointment Booked!',
   appointmentBookedMsg: 'Thank you! We will confirm your appointment shortly via email or phone.',
+  confirmationEmailUnavailable: 'Your appointment is saved, but we could not send a confirmation email. Please contact the clinic to confirm.',
   close: 'Close',
   pleaseFillAll: 'Please fill in all required fields.',
   somethingWrong: 'Something went wrong. Please try again.',
@@ -200,6 +201,7 @@ const hi: Strings = {
   booking: 'बुक हो रहा है...',
   appointmentBooked: 'अपॉइंटमेंट बुक हो गया!',
   appointmentBookedMsg: 'धन्यवाद! हम जल्द ही ईमेल या फोन के माध्यम से आपके अपॉइंटमेंट की पुष्टि करेंगे।',
+  confirmationEmailUnavailable: 'आपका अपॉइंटमेंट दर्ज हो गया है, लेकिन पुष्टि ईमेल नहीं भेज सका। कृपया पुष्टि के लिए क्लिनिक से संपर्क करें।',
   close: 'बंद करें',
   pleaseFillAll: 'कृपया सभी आवश्यक फ़ील्ड भरें।',
   somethingWrong: 'कुछ गलत हुआ। कृपया पुनः प्रयास करें।',
@@ -284,6 +286,7 @@ const bn: Strings = {
   booking: 'বুক হচ্ছে...',
   appointmentBooked: 'অ্যাপয়েন্টমেন্ট বুক হয়েছে!',
   appointmentBookedMsg: 'ধন্যবাদ! আমরা শীঘ্রই ইমেল বা ফোনের মাধ্যমে আপনার অ্যাপয়েন্টমেন্ট নিশ্চিত করব।',
+  confirmationEmailUnavailable: 'আপনার অ্যাপয়েন্টমেন্ট সংরক্ষিত হয়েছে, কিন্তু নিশ্চিতকরণ ইমেল পাঠানো যায়নি। নিশ্চিত করতে ক্লিনিকে যোগাযোগ করুন।',
   close: 'বন্ধ করুন',
   pleaseFillAll: 'কৃপয়া সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন।',
   somethingWrong: 'কিছু ভুল হয়েছে। আবার চেষ্টা করুন।',
@@ -368,6 +371,7 @@ const ta: Strings = {
   booking: 'பதிவு நடக்கிறது...',
   appointmentBooked: 'சந்திப்பு பதிவு செய்யப்பட்டது!',
   appointmentBookedMsg: 'நன்றி! மின்னஞ்சல் அல்லது தொலைபேசி மூலம் விரைவில் உங்கள் சந்திப்பை உறுதிப்படுத்துவோம்.',
+  confirmationEmailUnavailable: 'உங்கள் சந்திப்பு பதிவு செய்யப்பட்டது, ஆனால் உறுதிப்படுத்தல் மின்னஞ்சலை அனுப்ப முடியவில்லை. உறுதிப்படுத்த கிளினிக்கைத் தொடர்பு கொள்ளவும்.',
   close: 'மூடு',
   pleaseFillAll: 'அனைத்து தேவையான களங்களையும் நிரப்பவும்.',
   somethingWrong: 'ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.',
@@ -452,6 +456,7 @@ const te: Strings = {
   booking: 'బుక్ అవుతోంది...',
   appointmentBooked: 'అపాయింట్‌మెంట్ బుక్ అయింది!',
   appointmentBookedMsg: 'ధన్యవాదాలు! మేము త్వరలో ఇమెయిల్ లేదా ఫోన్ ద్వారా మీ అపాయింట్‌మెంట్‌ను నిర్ధారిస్తాము.',
+  confirmationEmailUnavailable: 'మీ అపాయింట్‌మెంట్ నమోదు అయింది, కానీ నిర్ధారణ ఇమెయిల్ పంపలేకపోయాము. నిర్ధారించుకోవడానికి క్లినిక్‌ను సంప్రదించండి.',
   close: 'మూసివేయి',
   pleaseFillAll: 'దయచేసి అన్ని అవసరమైన ఫీల్డ్‌లను నింపండి.',
   somethingWrong: 'ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి.',
@@ -536,6 +541,7 @@ const kn: Strings = {
   booking: 'ಬುಕ್ ಆಗುತ್ತಿದೆ...',
   appointmentBooked: 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಆಯಿತು!',
   appointmentBookedMsg: 'ಧನ್ಯವಾದಗಳು! ಇಮೇಲ್ ಅಥವಾ ಫೋನ್ ಮೂಲಕ ಶೀಘ್ರದಲ್ಲಿ ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ದೃಢೀಕರಿಸುತ್ತೇವೆ.',
+  confirmationEmailUnavailable: 'ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಉಳಿಸಲಾಗಿದೆ, ಆದರೆ ದೃಢೀಕರಣ ಇಮೇಲ್ ಕಳುಹಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದೃಢೀಕರಿಸಲು ಕ್ಲಿನಿಕ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.',
   close: 'ಮುಚ್ಚಿ',
   pleaseFillAll: 'ದಯವಿಟ್ಟು ಎಲ್ಲಾ ಅಗತ್ಯ ಕ್ಷೇತ್ರಗಳನ್ನು ತುಂಬಿಸಿ.',
   somethingWrong: 'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
@@ -620,6 +626,7 @@ const ml: Strings = {
   booking: 'ബുക്ക് ചെയ്യുന്നു...',
   appointmentBooked: 'അപ്പോയിന്റ്മെന്റ് ബുക്ക് ചെയ്തു!',
   appointmentBookedMsg: 'നന്ദി! ഇമെയിൽ അല്ലെങ്കിൽ ഫോൺ വഴി ഉടൻ തന്നെ നിങ്ങളുടെ അപ്പോയിന്റ്മെന്റ് സ്ഥിരീകരിക്കും.',
+  confirmationEmailUnavailable: 'നിങ്ങളുടെ അപ്പോയിന്റ്മെന്റ് രേഖപ്പെടുത്തി, പക്ഷേ സ്ഥിരീകരണ ഇമെയിൽ അയയ്ക്കാനായില്ല. സ്ഥിരീകരിക്കാൻ ക്ലിനിക്കുമായി ബന്ധപ്പെടുക.',
   close: 'അടയ്ക്കുക',
   pleaseFillAll: 'ദയവായി എല്ലാ ആവശ്യ ഫീൽഡുകളും പൂരിപ്പിക്കുക.',
   somethingWrong: 'എന്തോ തെറ്റി. വീണ്ടും ശ്രമിക്കുക.',
@@ -704,6 +711,7 @@ const mr: Strings = {
   booking: 'बुक होत आहे...',
   appointmentBooked: 'अपॉइंटमेंट बुक झाली!',
   appointmentBookedMsg: 'धन्यवाद! आम्ही लवकरच ईमेल किंवा फोनद्वारे तुमची अपॉइंटमेंट पुष्टी करू.',
+  confirmationEmailUnavailable: 'तुमची अपॉइंटमेंट नोंदवली आहे, पण पुष्टीकरण ईमेल पाठवता आला नाही. पुष्टीसाठी क्लिनिकशी संपर्क साधा.',
   close: 'बंद करा',
   pleaseFillAll: 'कृपया सर्व आवश्यक फील्ड भरा.',
   somethingWrong: 'काहीतरी चूक झाली. पुन्हा प्रयत्न करा.',
@@ -788,6 +796,7 @@ const pa: Strings = {
   booking: 'ਬੁੱਕ ਹੋ ਰਿਹਾ ਹੈ...',
   appointmentBooked: 'ਅਪੋਇਨਟਮੈਂਟ ਬੁੱਕ ਹੋ ਗਈ!',
   appointmentBookedMsg: 'ਧੰਨਵਾਦ! ਅਸੀਂ ਜਲਦੀ ਈਮੇਲ ਜਾਂ ਫੋਨ ਰਾਹੀਂ ਤੁਹਾਡੀ ਅਪੋਇਨਟਮੈਂਟ ਪੁਸ਼ਟੀ ਕਰਾਂਗੇ।',
+  confirmationEmailUnavailable: 'ਤੁਹਾਡੀ ਅਪੋਇਨਟਮੈਂਟ ਦਰਜ ਹੋ ਗਈ ਹੈ, ਪਰ ਪੁਸ਼ਟੀਕਰਨ ਈਮੇਲ ਨਹੀਂ ਭੇਜੀ ਜਾ ਸਕੀ। ਪੁਸ਼ਟੀ ਲਈ ਕਲੀਨਿਕ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।',
   close: 'ਬੰਦ ਕਰੋ',
   pleaseFillAll: 'ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੇ ਲੋੜੀਂਦੇ ਖੇਤਰ ਭਰੋ।',
   somethingWrong: 'ਕੁਝ ਗਲਤ ਹੋ ਗਿਆ। ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
@@ -872,6 +881,7 @@ const ur: Strings = {
   booking: 'بک ہو رہا ہے...',
   appointmentBooked: 'اپائنٹمنٹ بک ہو گئی!',
   appointmentBookedMsg: 'شکریہ! ہم جلد ہی ای میل یا فون کے ذریعے آپ کی اپائنٹمنٹ کی تصدیق کریں گے۔',
+  confirmationEmailUnavailable: 'آپ کی اپائنٹمنٹ محفوظ ہو گئی ہے، لیکن تصدیقی ای میل نہیں بھیجی جا سکی۔ تصدیق کے لیے کلینک سے رابطہ کریں۔',
   close: 'بند کریں',
   pleaseFillAll: 'براہ کرم تمام ضروری خانے بھریں۔',
   somethingWrong: 'کچھ غلط ہو گیا۔ دوبارہ کوشش کریں۔',

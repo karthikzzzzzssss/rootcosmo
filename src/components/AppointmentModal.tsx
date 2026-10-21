@@ -31,11 +31,13 @@ export default function AppointmentModal({ isOpen, onClose, selectedTreatment }:
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState('');
 
   useLayoutEffect(() => {
     if (isOpen) {
       setSuccess(false);
+      setEmailSent(false);
       setError('');
       setForm({ patient_name: '', email: '', phone: '', appointment_date: '', appointment_time: '', notes: '' });
     }
@@ -79,6 +81,7 @@ export default function AppointmentModal({ isOpen, onClose, selectedTreatment }:
       if (!res.ok || !json.success) {
         setError(json.error || t('somethingWrong'));
       } else {
+        setEmailSent(json.email_sent === true);
         setSuccess(true);
       }
     } catch {
@@ -124,7 +127,9 @@ export default function AppointmentModal({ isOpen, onClose, selectedTreatment }:
             <CheckCircle2 className="text-green-500 mb-4" size={56} />
             <h3 className="text-xl font-bold text-gray-900 mb-2">{t('appointmentBooked')}</h3>
             <p className="text-gray-600 text-sm mb-6">
-              {t('appointmentBookedMsg')} Please check your <strong>spam/junk folder</strong> if you don't see the confirmation email.
+              {emailSent
+                ? <>{t('appointmentBookedMsg')} Please check your <strong>spam/junk folder</strong> if you don't see the confirmation email.</>
+                : t('confirmationEmailUnavailable')}
             </p>
             <button
               onClick={onClose}
