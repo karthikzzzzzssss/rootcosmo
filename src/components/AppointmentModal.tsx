@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { X, CheckCircle2 } from 'lucide-react';
 import type { Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const APPOINTMENT_ENDPOINT = API_URL ? `${API_URL}/api/appointments` : '/api/appointments';
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export default function AppointmentModal({ isOpen, onClose, selectedTreatment }:
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen) {
       setSuccess(false);
       setError('');
@@ -57,7 +58,7 @@ export default function AppointmentModal({ isOpen, onClose, selectedTreatment }:
 
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/api/appointments`, {
+      const res = await fetch(APPOINTMENT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
