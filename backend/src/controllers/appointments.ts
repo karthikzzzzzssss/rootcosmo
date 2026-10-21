@@ -50,15 +50,27 @@ export async function createAppointment(req: Request, res: Response) {
 
   if (error) return res.status(500).json({ success: false, error: error.message });
 
-  // Send confirmation emails (non-blocking)
-  sendAppointmentConfirmation({
-    patient_name, email, phone,
-    treatment_name: treatment_name || null,
-    appointment_date, appointment_time,
-    notes: notes || null,
-  }).catch(err => console.error('Email error:', err));
+  let emailSent = false;
+  try {
+    const result = await sendAppointmentConfirmation({
+      patient_name, email, phone,
+      treatment_name: treatment_name || null,
+      appointment_date, appointment_time,
+      notes: notes || null,
+    });
+    emailSent = result.patientEmailSent;
+  } catch (error) {
+    console.error('Appointment saved, but patient confirmation failed:', error instanceof Error ? error.message : 'Unknown email error');
+  }
 
-  res.status(201).json({ success: true, data, message: 'Appointment booked successfully' });
+  res.status(201).json({
+    success: true,
+    email_sent: emailSent,
+    data,
+    message: emailSent
+      ? 'Appointment booked successfully.'
+      : 'Appointment saved, but the confirmation email could not be sent. Please contact the clinic to confirm.',
+  });
 }
 
 export async function updateAppointmentStatus(req: Request, res: Response) {
