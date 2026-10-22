@@ -27,7 +27,7 @@ router.get('/appointments/export/excel', exportAppointmentsExcel);
 router.get('/appointments/:id', getAppointmentById);
 router.post('/appointments', [
   body('patient_name').trim().notEmpty().withMessage('Patient name is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
+  body('email').trim().isEmail().withMessage('Valid email is required'),
   body('phone').trim().notEmpty().withMessage('Phone number is required'),
   body('appointment_date').isDate().withMessage('Valid date is required'),
   body('appointment_time').trim().notEmpty().withMessage('Time slot is required'),

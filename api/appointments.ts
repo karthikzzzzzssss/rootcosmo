@@ -1,5 +1,5 @@
+import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
-import nodemailer from 'nodemailer';
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -85,59 +85,84 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
     return res.status(500).json({ success: false, error: 'Unable to save your appointment. Please try again or call the clinic.' });
   }
 
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
   let emailSent = false;
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM;
 
-  if (smtpUser && smtpPass) {
-    const smtpPort = Number(process.env.SMTP_PORT) || 587;
-    const fromEmail = process.env.SMTP_FROM_EMAIL || smtpUser;
-    const safeName = escapeHtml(patientName);
-    const safePhone = escapeHtml(phone);
-    const safeTreatment = escapeHtml(treatmentName || 'General Consultation');
-    const safeDate = escapeHtml(appointmentDate);
-    const safeTime = escapeHtml(appointmentTime);
-    const safeNotes = notes ? escapeHtml(notes) : '';
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: smtpPort,
-      secure: smtpPort === 465,
-      connectionTimeout: 8000,
-      greetingTimeout: 8000,
-      socketTimeout: 10000,
-      auth: { user: smtpUser, pass: smtpPass },
-    });
+  if (!apiKey || !from) {
+    console.error('Appointment saved, but RESEND_API_KEY or EMAIL_FROM is missing.');
+  } else {
+    const resend = new Resend(apiKey);
+    const patientNameHtml = escapeHtml(patientName);
+    const phoneHtml = escapeHtml(phone);
+    const treatmentHtml = treatmentName ? escapeHtml(treatmentName) : null;
+    const dateHtml = escapeHtml(appointmentDate);
+    const timeHtml = escapeHtml(appointmentTime);
+    const notesHtml = notes ? escapeHtml(notes) : null;
+    const clinicPhone = process.env.CLINIC_PHONE;
+    const clinicEmail = process.env.CLINIC_EMAIL;
+    const changeContact = clinicPhone || clinicEmail;
 
     try {
-      await transporter.sendMail({
-        from: `"RootCosmo Clinic" <${fromEmail}>`,
-        replyTo: fromEmail,
-        to: email,
-        subject: 'Appointment received - RootCosmo Clinic',
-        text: `Hello ${patientName}, we received your appointment request for ${appointmentDate} at ${appointmentTime}. The clinic will contact you to confirm.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px;border:1px solid #e5e7eb;border-radius:12px"><h2 style="color:#5b0fa8">Appointment request received</h2><p>Hello <strong>${safeName}</strong>,</p><p>We received your appointment request. The clinic will contact you to confirm it.</p><table style="width:100%;border-collapse:collapse"><tr><td style="padding:8px;color:#6b7280">Service</td><td style="padding:8px">${safeTreatment}</td></tr><tr><td style="padding:8px;color:#6b7280">Date</td><td style="padding:8px">${safeDate}</td></tr><tr><td style="padding:8px;color:#6b7280">Time</td><td style="padding:8px">${safeTime}</td></tr><tr><td style="padding:8px;color:#6b7280">Phone</td><td style="padding:8px">${safePhone}</td></tr>${safeNotes ? `<tr><td style="padding:8px;color:#6b7280">Notes</td><td style="padding:8px">${safeNotes}</td></tr>` : ''}</table><p style="color:#5b0fa8;font-weight:600">RootCosmo Clinic, Hyderabad</p></div>`,
+      const result = await resend.emails.send({
+        from,
+        replyTo: from,
+        to: [email],
+        subject: 'Your RootCosmo Appointment Confirmation',
+        text: `Hello ${patientName}, your appointment has been booked for ${appointmentDate} at ${appointmentTime}.${treatmentName ? ` Service: ${treatmentName}.` : ''}${changeContact ? ` To make a change, contact the clinic at ${changeContact}.` : ' To make a change, please contact the clinic.'}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;color:#1f2937">
+            <h1 style="color:#5b0fa8;margin-bottom:8px">RootCosmo</h1>
+            <p style="margin-top:0;color:#6b7280">RootCosmo Clinic, Hyderabad</p>
+            <p>Hello <strong>${patientNameHtml}</strong>,</p>
+            <p>Your appointment has been booked. Here are the details:</p>
+            <table style="width:100%;border-collapse:collapse;margin:16px 0">
+              ${treatmentHtml ? `<tr><td style="padding:8px;color:#6b7280">Service</td><td style="padding:8px;font-weight:600">${treatmentHtml}</td></tr>` : ''}
+              <tr><td style="padding:8px;color:#6b7280">Date</td><td style="padding:8px;font-weight:600">${dateHtml}</td></tr>
+              <tr><td style="padding:8px;color:#6b7280">Time</td><td style="padding:8px;font-weight:600">${timeHtml}</td></tr>
+              <tr><td style="padding:8px;color:#6b7280">Phone</td><td style="padding:8px;font-weight:600">${phoneHtml}</td></tr>
+              ${notesHtml ? `<tr><td style="padding:8px;color:#6b7280">Notes</td><td style="padding:8px">${notesHtml}</td></tr>` : ''}
+            </table>
+            ${clinicPhone ? `<p>Clinic contact: <strong>${escapeHtml(clinicPhone)}</strong></p>` : ''}
+            <p>If you need to change your appointment, please contact the clinic.</p>
+          </div>
+        `,
       });
-      emailSent = true;
-    } catch (mailError) {
-      console.error('Appointment confirmation email failed:', mailError instanceof Error ? mailError.message : 'Unknown mail error');
+
+      if (result.error) {
+        console.error('Resend rejected the patient confirmation email:', result.error.message);
+      } else if (result.data?.id) {
+        emailSent = true;
+        console.info('Resend accepted the patient confirmation email.', { emailId: result.data.id });
+      } else {
+        console.error('Resend returned no ID for the patient confirmation email.');
+      }
+    } catch (error) {
+      console.error('Patient confirmation email request failed:', error instanceof Error ? error.message : 'Unknown email error');
     }
 
-    const clinicEmail = process.env.CLINIC_EMAIL;
     if (clinicEmail) {
       try {
-        await transporter.sendMail({
-          from: `"RootCosmo Booking" <${fromEmail}>`,
-          to: clinicEmail,
-          subject: 'New appointment request',
-          text: `Patient: ${patientName}\nEmail: ${email}\nPhone: ${phone}\nService: ${treatmentName || 'General Consultation'}\nDate: ${appointmentDate}\nTime: ${appointmentTime}${notes ? `\nNotes: ${notes}` : ''}`,
+        const clinicResult = await resend.emails.send({
+          from,
+          to: [clinicEmail],
+          subject: 'New RootCosmo appointment',
+          text: `Patient: ${patientName}\nEmail: ${email}\nPhone: ${phone}\n${treatmentName ? `Service: ${treatmentName}\n` : ''}Date: ${appointmentDate}\nTime: ${appointmentTime}${notes ? `\nNotes: ${notes}` : ''}`,
         });
-      } catch (mailError) {
-        console.error('Clinic appointment notification failed:', mailError instanceof Error ? mailError.message : 'Unknown mail error');
+        if (clinicResult.error) {
+          console.error('Resend rejected the clinic notification email:', clinicResult.error.message);
+        }
+      } catch (error) {
+        console.error('Clinic appointment notification failed:', error instanceof Error ? error.message : 'Unknown email error');
       }
     }
-  } else {
-    console.error('Appointment saved, but SMTP_USER or SMTP_PASS is not configured.');
   }
 
-  return res.status(201).json({ success: true, email_sent: emailSent, message: 'Appointment booked successfully' });
+  return res.status(201).json({
+    success: true,
+    email_sent: emailSent,
+    message: emailSent
+      ? 'Appointment booked successfully.'
+      : 'Appointment saved, but the confirmation email could not be sent. Please contact the clinic to confirm.',
+  });
 }
