@@ -6,6 +6,7 @@ declare const process: { env: Record<string, string | undefined> };
 type AppointmentRequest = {
   method?: string;
   body?: unknown;
+  headers?: Record<string, string | string[] | undefined>;
 };
 
 type AppointmentResponse = {
@@ -29,11 +30,50 @@ function escapeHtml(value: string): string {
   })[character] ?? character);
 }
 
+function headerValue(req: AppointmentRequest, name: string): string {
+  const raw = req.headers?.[name] ?? req.headers?.[name.toLowerCase()];
+  return Array.isArray(raw) ? raw[0] ?? '' : raw ?? '';
+}
+
 export default async function handler(req: AppointmentRequest, res: AppointmentResponse) {
-  res.setHeader('Allow', 'POST, OPTIONS');
+  res.setHeader('Allow', 'GET, POST, OPTIONS');
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
+  }
+
+  // Admin-only: list appointments (patient PII). Guarded by the shared admin
+  // token and served with the service-role key, since the anon key no longer
+  // has read access to the appointments table.
+  if (req.method === 'GET') {
+    const expectedToken = process.env.ADMIN_TOKEN;
+    if (!expectedToken) {
+      return res.status(503).json({ success: false, error: 'Admin access is not configured on the server.' });
+    }
+    const providedToken = headerValue(req, 'x-admin-token');
+    if (!providedToken || providedToken !== expectedToken) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+
+    const adminUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!adminUrl || !serviceRoleKey) {
+      console.error('Admin appointments GET is missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.');
+      return res.status(500).json({ success: false, error: 'Server is missing admin database configuration.' });
+    }
+
+    const adminClient = createClient(adminUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data, error } = await adminClient
+      .from('appointments')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('Admin appointments GET failed:', { code: error.code, message: error.message });
+      return res.status(500).json({ success: false, error: 'Could not load appointments.' });
+    }
+    return res.status(200).json({ success: true, data });
   }
 
   if (req.method !== 'POST') {

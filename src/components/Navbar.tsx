@@ -488,10 +488,9 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
 
           <div className="hidden xl:block flex-1" />
 
-          {/* Export Excel button — admin only */}
+          {/* Shop at RootCosmo */}
           <a
-            href="http://localhost:4000/api/appointments/export/excel"
-            download
+            href="/#products"
             className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90"
             style={{
               background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%)',

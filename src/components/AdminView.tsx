@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   ArrowLeft,
   Download,
@@ -9,10 +9,14 @@ import {
   ShoppingBag,
   Search,
   Clock,
+  Lock,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { exportWorkbook, downloadBlob, buildExportFilename, fmtDate } from '../lib/exportExcel';
 import type { Appointment, Category, Product, Treatment } from '../types';
+
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const APPOINTMENTS_ENDPOINT = API_URL ? `${API_URL}/api/appointments` : '/api/appointments';
 
 interface AdminViewProps {
   onExit: () => void;
@@ -37,14 +41,28 @@ export default function AdminView({ onExit }: AdminViewProps) {
   const [exportError, setExportError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('appointments');
   const [query, setQuery] = useState('');
+  const [adminToken, setAdminToken] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem('rc_admin_token');
+    } catch {
+      return null;
+    }
+  });
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
 
   useEffect(() => {
+    if (!adminToken) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
       setLoadError('');
-      const [appts, cats, treats, prods] = await Promise.all([
-        supabase.from('appointments').select('*').order('created_at', { ascending: false }),
+
+      // Appointments hold patient PII, so they are served only by the API
+      // (service-role key) behind the admin token. The catalog tables are
+      // public read-only and are safe to fetch with the anon key.
+      const [apptRes, cats, treats, prods] = await Promise.all([
+        fetch(APPOINTMENTS_ENDPOINT, { headers: { 'x-admin-token': adminToken } }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
         supabase.from('treatments').select('*').order('created_at', { ascending: true }),
         supabase.from('products').select('*').order('created_at', { ascending: true }),
@@ -52,24 +70,56 @@ export default function AdminView({ onExit }: AdminViewProps) {
 
       if (cancelled) return;
 
-      if (appts.error || cats.error || treats.error || prods.error) {
-        setLoadError('Could not load all data from the database. Please try again.');
-        setAppointments(appts.data ?? []);
-        setCategories(cats.data ?? []);
-        setTreatments(treats.data ?? []);
-        setProducts(prods.data ?? []);
-      } else {
-        setAppointments(appts.data ?? []);
-        setCategories(cats.data ?? []);
-        setTreatments(treats.data ?? []);
-        setProducts(prods.data ?? []);
+      if (apptRes.status === 401 || apptRes.status === 403) {
+        try {
+          sessionStorage.removeItem('rc_admin_token');
+        } catch {
+          /* ignore */
+        }
+        setAdminToken(null);
+        setAuthError('Incorrect password, or your session has expired. Please sign in again.');
+        setLoading(false);
+        return;
       }
+
+      let appts: Appointment[] = [];
+      let apptOk = apptRes.ok;
+      if (apptRes.ok) {
+        try {
+          const json = await apptRes.json();
+          appts = json.data ?? [];
+        } catch {
+          apptOk = false;
+        }
+      }
+
+      if (!apptOk || cats.error || treats.error || prods.error) {
+        setLoadError('Could not load all data. Please try again.');
+      }
+      setAppointments(appts);
+      setCategories(cats.data ?? []);
+      setTreatments(treats.data ?? []);
+      setProducts(prods.data ?? []);
       setLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [adminToken]);
+
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
+    const pw = password.trim();
+    if (!pw) return;
+    try {
+      sessionStorage.setItem('rc_admin_token', pw);
+    } catch {
+      /* ignore */
+    }
+    setAuthError('');
+    setAdminToken(pw);
+    setPassword('');
+  };
 
   const stats = useMemo(
     () => [
@@ -111,6 +161,55 @@ export default function AdminView({ onExit }: AdminViewProps) {
         a.status.toLowerCase().includes(q),
     );
   }, [appointments, query]);
+
+  if (!adminToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <form
+          onSubmit={handleLogin}
+          className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 shadow-sm p-8"
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+            style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #5b0fa8 100%)' }}
+          >
+            <Lock size={22} className="text-white" />
+          </div>
+          <h1 className="text-xl font-bold text-gray-900">Admin sign in</h1>
+          <p className="text-sm text-gray-500 mt-1 mb-6">
+            Enter the admin password to manage appointments.
+          </p>
+          {authError && (
+            <div className="mb-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm px-3 py-2 rounded-lg">
+              {authError}
+            </div>
+          )}
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Admin password"
+            autoFocus
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+          />
+          <button
+            type="submit"
+            className="mt-4 w-full text-white text-sm font-semibold py-2.5 rounded-lg transition-opacity hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #5b0fa8 100%)' }}
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            onClick={onExit}
+            className="mt-3 w-full text-gray-500 text-sm py-2 hover:text-gray-700"
+          >
+            Back to site
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

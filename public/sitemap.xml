@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://rootcosmo.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/dental-care</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/face-aesthetics</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/medifacials</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/hair-care</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/lip-aesthetics</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rootcosmo.vercel.app/categories/laser-treatment</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>

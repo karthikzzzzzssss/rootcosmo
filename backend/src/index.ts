@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'https://rootcosmo.vercel.app',
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token'],
 }));
 app.use(express.json());
 app.get('/', (_req, res) => {
