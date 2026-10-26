@@ -1,7 +1,29 @@
+// A distinct, relevant photo per treatment (no image repeats anywhere on the
+// site). Used when a treatment row has no image_url of its own.
+const px = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
+
 export const TREATMENT_IMAGE_OVERRIDES: Record<string, string> = {
-  'Lip Fillers': '/images/services/lip-aesthetics/lip-fillers-2.jpeg',
-  'Lip Pigmentation': '/images/services/lip-aesthetics/lip-pigmentation.webp',
-  'Lip Rejuvenation': '/images/services/lip-aesthetics/lip-rejuvenation.jpg',
+  // Dental Care
+  'Teeth Cleaning': px(20301626),
+  'Teeth Whitening': px(14235198),
+  'Dental Implants': px(11768114),
+  // Face Aesthetics
+  'Botox Treatment': px(30809944),
+  'Dermal Fillers': px(3865548),
+  'Chemical Peel': px(6978043),
+  // MediFacials
+  'HydraFacial': px(7446659),
+  'Acne MediFacial': px(37229282),
+  // Hair Care
+  'PRP Hair Treatment': px(23349910),
+  'Hair Growth Therapy': px(38595833),
+  // Lip Aesthetics
+  'Lip Fillers': px(10816496),
+  'Lip Contouring': px(3762434),
+  // Laser Treatment
+  'Laser Hair Reduction': px(5069499),
+  'Laser Skin Resurfacing': px(4586750),
 };
 
 export const CATEGORY_IMAGE_OVERRIDES: Record<string, string> = {

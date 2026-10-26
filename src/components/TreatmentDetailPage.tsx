@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Check, Clock, Shield, Star, ChevronRight } from 'l
 import { supabase } from '../lib/supabase';
 import type { Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
-import { categoryFallbackImage } from '../lib/imageOverrides';
+import { categoryFallbackImage, getTreatmentImage } from '../lib/imageOverrides';
 
 interface TreatmentDetailPageProps {
   treatmentName: string;
@@ -141,7 +141,7 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
       >
         <div className="absolute inset-0">
           <img
-            src={treatment.image_url?.trim() ? treatment.image_url : categoryFallbackImage(treatment.category_name)}
+            src={getTreatmentImage(treatment.name, treatment.image_url, treatment.category_name)}
             alt={tt(treatment.name)}
             decoding="async"
             onError={(e) => {
@@ -314,7 +314,7 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
                   >
                     <div className="relative overflow-hidden">
                       <img
-                        src={r.image_url?.trim() ? r.image_url : categoryFallbackImage(r.category_name)}
+                        src={getTreatmentImage(r.name, r.image_url, r.category_name)}
                         alt={tt(r.name)}
                         loading="lazy"
                         decoding="async"
