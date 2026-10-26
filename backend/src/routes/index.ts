@@ -8,6 +8,7 @@ import {
 } from '../controllers/appointments';
 import { getProducts, getProductById } from '../controllers/products';
 import { exportAppointmentsExcel } from '../controllers/appointments';
+import { requireAdmin } from '../middleware/adminAuth';
 
 const router = Router();
 
@@ -22,9 +23,11 @@ router.get('/treatments/by-name/:name', getTreatmentByName);
 router.get('/treatments/:id', getTreatmentById);
 
 // ── Appointments ────────────────────────────────────────
-router.get('/appointments', getAppointments);
-router.get('/appointments/export/excel', exportAppointmentsExcel);
-router.get('/appointments/:id', getAppointmentById);
+// Public: anyone may book an appointment (POST).
+// Admin-only (patient PII): list, fetch, export, update status, delete.
+router.get('/appointments', requireAdmin, getAppointments);
+router.get('/appointments/export/excel', requireAdmin, exportAppointmentsExcel);
+router.get('/appointments/:id', requireAdmin, getAppointmentById);
 router.post('/appointments', [
   body('patient_name').trim().notEmpty().withMessage('Patient name is required'),
   body('email').trim().isEmail().withMessage('Valid email is required'),
@@ -32,8 +35,8 @@ router.post('/appointments', [
   body('appointment_date').isDate().withMessage('Valid date is required'),
   body('appointment_time').trim().notEmpty().withMessage('Time slot is required'),
 ], createAppointment);
-router.patch('/appointments/:id/status', updateAppointmentStatus);
-router.delete('/appointments/:id', deleteAppointment);
+router.patch('/appointments/:id/status', requireAdmin, updateAppointmentStatus);
+router.delete('/appointments/:id', requireAdmin, deleteAppointment);
 
 // ── Products ────────────────────────────────────────────
 router.get('/products', getProducts);
