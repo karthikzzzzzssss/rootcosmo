@@ -162,7 +162,7 @@ function AppContent() {
             <PremierTreatments onBook={openModal} onViewAll={() => navigateTo('dental-care')} />
             <WhyChooseUs onBookAppointment={() => openModal()} />
             <PopularTreatments onBook={openModal} onBookAppointment={() => openModal()} onViewAll={() => navigateTo('face-aesthetics')} />
-            <ProductsSection onViewAll={() => navigateTo('dental-care')} />
+            <ProductsSection onNavigate={navigateTo} />
           </>
         )}
       </main>

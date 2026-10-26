@@ -1,25 +1,40 @@
-import { useEffect, useState } from 'react';
-import { ShoppingCart } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import type { Product } from '../types';
+import { ArrowRight } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
-import { categoryFallbackImage } from '../lib/imageOverrides';
 
-export default function ProductsSection({ onViewAll }: { onViewAll: () => void }) {
-  const { t, tt } = useI18n();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+const px = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
 
-  useEffect(() => {
-    supabase
-      .from('products')
-      .select('*')
-      .order('created_at')
-      .then(({ data, error }) => {
-        if (!error && data) setProducts(data);
-        setLoading(false);
-      });
-  }, []);
+// Four product categories, mirroring rootcosmo.com's "Find Our Best Products
+// By Category" section. "Shop Now" takes the visitor to the related services.
+const PRODUCT_CATEGORIES = [
+  {
+    title: 'Dental Care Products',
+    desc: 'Smile Bolder, Shine Bolder: Discover Your Dental Care Essentials Today!',
+    img: px(8669541),
+    slug: 'dental-care',
+  },
+  {
+    title: 'Skin Care Products',
+    desc: 'Unveil Your Radiance: Discover Skin Care Secrets for a Glowing You!',
+    img: px(9774854),
+    slug: 'face-aesthetics',
+  },
+  {
+    title: 'Body Care Products',
+    desc: 'Elevate Your Body Ritual: Discover Luxurious Care for Every Inch!',
+    img: px(9775219),
+    slug: 'medifacials',
+  },
+  {
+    title: 'Hair Care Products',
+    desc: 'Nourish, Strengthen, Grow: Embrace Vibrant Hair with Our Hair Care Products!',
+    img: px(8484212),
+    slug: 'hair-care',
+  },
+];
+
+export default function ProductsSection({ onNavigate }: { onNavigate: (slug: string) => void }) {
+  const { t } = useI18n();
 
   return (
     <section className="py-12 px-4 bg-white" id="products">
@@ -27,60 +42,41 @@ export default function ProductsSection({ onViewAll }: { onViewAll: () => void }
         <div className="flex items-center justify-between mb-8">
           <h2 className="section-title text-gray-900">{t('findOurBestProducts')}</h2>
           <button
-            onClick={onViewAll}
+            onClick={() => onNavigate('dental-care')}
             className="text-gray-700 font-bold text-sm tracking-widest hover:text-purple-700 transition-colors uppercase cursor-pointer"
           >
             {t('viewAll')}
           </button>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 rounded-lg h-56 mb-3" />
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-1" />
-                <div className="h-3 bg-gray-100 rounded w-1/2" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {PRODUCT_CATEGORIES.map((c) => (
+            <div
+              key={c.title}
+              className="group flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <div className="relative overflow-hidden">
+                <img
+                  src={c.img}
+                  alt={c.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {products.map(product => (
-              <div
-                key={product.id}
-                className="group bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.image_url?.trim() ? product.image_url : categoryFallbackImage(product.category)}
-                    alt={tt(product.name)}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      const fb = categoryFallbackImage(product.category);
-                      if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
-                    }}
-                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 right-2">
-                    <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full">
-                      {tt(product.category)}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">{tt(product.name)}</h3>
-                  <p className="text-purple-700 font-bold text-base mb-3">₹{Number(product.price).toFixed(2)}</p>
-                  <button className="w-full flex items-center justify-center gap-2 bg-purple-700 text-white text-xs font-semibold py-2.5 rounded-full hover:bg-purple-800 transition-colors uppercase tracking-wide">
-                    <ShoppingCart size={13} />
-                    {t('addToCart')}
-                  </button>
-                </div>
+              <div className="flex flex-1 flex-col p-4">
+                <h3 className="font-bold text-gray-900 text-base mb-1.5">{c.title}</h3>
+                <p className="mb-4 flex-1 text-gray-500 text-sm leading-relaxed">{c.desc}</p>
+                <button
+                  onClick={() => onNavigate(c.slug)}
+                  className="mt-auto inline-flex items-center gap-1.5 self-start bg-purple-700 px-5 py-2.5 text-white text-xs font-semibold rounded-full hover:bg-purple-800 transition-colors uppercase tracking-wide"
+                >
+                  Shop Now <ArrowRight size={14} />
+                </button>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
