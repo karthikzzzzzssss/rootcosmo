@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Check, Clock, Shield, Star, ChevronRight } from 'l
 import { supabase } from '../lib/supabase';
 import type { Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
+import { categoryFallbackImage } from '../lib/imageOverrides';
 
 interface TreatmentDetailPageProps {
   treatmentName: string;
@@ -140,8 +141,13 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
       >
         <div className="absolute inset-0">
           <img
-            src={treatment.image_url}
+            src={treatment.image_url?.trim() ? treatment.image_url : categoryFallbackImage(treatment.category_name)}
             alt={tt(treatment.name)}
+            decoding="async"
+            onError={(e) => {
+              const fb = categoryFallbackImage(treatment.category_name);
+              if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
+            }}
             className="absolute right-0 top-0 h-full w-full lg:w-[50%] object-cover object-center"
             style={{
               opacity: 0.7,
@@ -308,8 +314,14 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
                   >
                     <div className="relative overflow-hidden">
                       <img
-                        src={r.image_url}
+                        src={r.image_url?.trim() ? r.image_url : categoryFallbackImage(r.category_name)}
                         alt={tt(r.name)}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          const fb = categoryFallbackImage(r.category_name);
+                          if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
+                        }}
                         className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
