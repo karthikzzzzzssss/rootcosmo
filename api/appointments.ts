@@ -87,10 +87,11 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
 
   let emailSent = false;
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
+  // Accept either name: the Vercel project defines FROM_EMAIL, older config used EMAIL_FROM.
+  const from = process.env.EMAIL_FROM || process.env.FROM_EMAIL;
 
   if (!apiKey || !from) {
-    console.error('Appointment saved, but RESEND_API_KEY or EMAIL_FROM is missing.');
+    console.error('Appointment saved, but RESEND_API_KEY or the sender (FROM_EMAIL/EMAIL_FROM) is missing.');
   } else {
     const resend = new Resend(apiKey);
     const patientNameHtml = escapeHtml(patientName);
