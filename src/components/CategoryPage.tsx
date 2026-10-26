@@ -3,7 +3,7 @@ import { ArrowLeft, LayoutGrid, List, SlidersHorizontal, Calendar, Sparkles, Che
 import { supabase } from '../lib/supabase';
 import type { Category, Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
-import { getTreatmentImage } from '../lib/imageOverrides';
+import { getTreatmentImage, categoryFallbackImage } from '../lib/imageOverrides';
 
 interface CategoryPageProps {
   slug: string;
@@ -332,8 +332,14 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
                   >
                     <div className="relative overflow-hidden">
                       <img
-                        src={getTreatmentImage(treatment.name, treatment.image_url)}
+                        src={getTreatmentImage(treatment.name, treatment.image_url, treatment.category_name)}
                         alt={tt(treatment.name)}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          const fb = categoryFallbackImage(treatment.category_name);
+                          if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
+                        }}
                         className="w-full h-48 object-cover brightness-105 saturate-105 group-hover:scale-105 group-hover:brightness-110 transition-all duration-300"
                       />
                       <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-purple-700 text-white flex items-center justify-center text-xs font-bold hover:bg-purple-800 transition-colors shadow">

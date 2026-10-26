@@ -1,6 +1,6 @@
 import type { Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
-import { getTreatmentImage } from '../lib/imageOverrides';
+import { getTreatmentImage, categoryFallbackImage } from '../lib/imageOverrides';
 
 interface TreatmentCardProps {
   treatment: Treatment;
@@ -13,8 +13,14 @@ export default function TreatmentCard({ treatment, onBook }: TreatmentCardProps)
     <div className="treatment-card flex h-full w-[220px] min-w-[220px] max-w-[220px] flex-none flex-col">
       <div className="relative">
         <img
-          src={getTreatmentImage(treatment.name, treatment.image_url)}
+          src={getTreatmentImage(treatment.name, treatment.image_url, treatment.category_name)}
           alt={tt(treatment.name)}
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            const fb = categoryFallbackImage(treatment.category_name);
+            if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
+          }}
           className="w-full h-44 object-cover brightness-105 saturate-105"
         />
         {/* Info icon */}

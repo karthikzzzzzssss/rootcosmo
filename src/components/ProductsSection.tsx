@@ -3,6 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Product } from '../types';
 import { useI18n } from '../i18n/I18nContext';
+import { categoryFallbackImage } from '../lib/imageOverrides';
 
 export default function ProductsSection({ onViewAll }: { onViewAll: () => void }) {
   const { t, tt } = useI18n();
@@ -52,8 +53,14 @@ export default function ProductsSection({ onViewAll }: { onViewAll: () => void }
               >
                 <div className="relative overflow-hidden">
                   <img
-                    src={product.image_url}
+                    src={product.image_url?.trim() ? product.image_url : categoryFallbackImage(product.category)}
                     alt={tt(product.name)}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      const fb = categoryFallbackImage(product.category);
+                      if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
+                    }}
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-2 right-2">
