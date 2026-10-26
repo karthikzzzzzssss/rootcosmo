@@ -3,8 +3,12 @@ import { X, CheckCircle2 } from 'lucide-react';
 import type { Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 
-const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-const APPOINTMENT_ENDPOINT = API_URL ? `${API_URL}/api/appointments` : '/api/appointments';
+// Always book through the same-origin serverless function (/api/appointments).
+// It sends the Resend confirmation email and writes to the live database.
+// We intentionally ignore VITE_API_URL here: when it pointed at the old Render
+// origin, bookings went to a backend that sent no confirmation email and used a
+// separate, out-of-date database.
+const APPOINTMENT_ENDPOINT = '/api/appointments';
 
 interface AppointmentModalProps {
   isOpen: boolean;
