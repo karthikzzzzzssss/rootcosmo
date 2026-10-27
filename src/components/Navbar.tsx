@@ -548,7 +548,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           {/* Shop at RootCosmo — only when there is room (wide screens) */}
           <a
             href="/#products"
-            className="hidden min-[1400px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
+            className="hidden xl:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%)',
               boxShadow: '0 2px 16px rgba(147,51,234,0.6)',
@@ -558,19 +558,6 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
             <ShoppingCart size={17} className="flex-shrink-0" />
             <span>Shop at RootCosmo</span>
           </a>
-
-          {/* Book Appointment CTA — right */}
-          <button
-            onClick={onBookAppointment}
-            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
-            style={{
-              background: 'linear-gradient(135deg, #ca8a04 0%, #eab308 100%)',
-              boxShadow: '0 2px 12px rgba(234,179,8,0.45)',
-            }}
-          >
-            <ShoppingCart size={16} />
-            {t('bookAppointment')}
-          </button>
 
           {/* Mobile toggle */}
           <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden text-white p-1 ml-auto" aria-expanded={mobileOpen} aria-label="Menu">
