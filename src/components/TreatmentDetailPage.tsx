@@ -45,44 +45,22 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
               setLoading(false);
             });
         } else {
-          // Try partial match — the menu child name may be a variant of a DB treatment
-          supabase
-            .from('treatments')
-            .select('*')
-            .ilike('name', `%${treatmentName.split(' ')[0]}%`)
-            .limit(1)
-            .then(({ data: partial }) => {
-              if (partial && partial.length > 0) {
-                const found = partial[0];
-                setTreatment(found);
-                supabase
-                  .from('treatments')
-                  .select('*')
-                  .eq('category_name', found.category_name)
-                  .neq('id', found.id)
-                  .limit(4)
-                  .order('is_popular', { ascending: false })
-                  .then(({ data: rel2 }) => {
-                    if (rel2) setRelated(rel2);
-                    setLoading(false);
-                  });
-              } else {
-                // No DB match — create a fallback treatment object from the URL name
-                setTreatment({
-                  id: '',
-                  name: treatmentName,
-                  category_id: null,
-                  category_name: '',
-                  price: 0,
-                  image_url: '',
-                  description: null,
-                  is_popular: false,
-                  is_premier: false,
-                  created_at: '',
-                } as Treatment);
-                setLoading(false);
-              }
-            });
+          // No exact DB match (most menu treatments live only in the menu, not
+          // the DB). Show the requested treatment itself, with its own mapped
+          // image — never a different treatment's content/image.
+          setTreatment({
+            id: '',
+            name: treatmentName,
+            category_id: null,
+            category_name: '',
+            price: 0,
+            image_url: '',
+            description: null,
+            is_popular: false,
+            is_premier: false,
+            created_at: '',
+          } as Treatment);
+          setLoading(false);
         }
       });
   }, [treatmentName]);
