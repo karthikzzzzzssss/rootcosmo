@@ -354,8 +354,8 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
             </div>
             <div className="flex flex-col items-start leading-none">
               <div className="flex items-baseline">
-                <span className="text-white font-extrabold text-[1.6rem] tracking-tight leading-none">Root</span>
-                <span className="text-purple-300 font-extrabold text-[1.6rem] tracking-tight leading-none">cosmo</span>
+                <span className="text-white font-extrabold text-[1.4rem] tracking-tight leading-none">Root</span>
+                <span className="text-purple-300 font-extrabold text-[1.4rem] tracking-tight leading-none">cosmo</span>
               </div>
               <span className="text-purple-300/70 text-[10px] font-light tracking-widest mt-0.5">
                 {t('navTagline')}
@@ -364,7 +364,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           </button>
 
           {/* Search bar */}
-          <div ref={searchRef} className="relative hidden md:flex w-28 lg:w-32 flex-shrink-0">
+          <div ref={searchRef} className="relative hidden md:flex w-24 lg:w-28 flex-shrink-0">
             <div className="relative w-full">
               <input
                 type="text"
@@ -548,7 +548,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           {/* Shop at RootCosmo — only when there is room (wide screens) */}
           <a
             href="/#products"
-            className="hidden min-[1460px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
+            className="hidden min-[1400px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%)',
               boxShadow: '0 2px 16px rgba(147,51,234,0.6)',
