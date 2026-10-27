@@ -12,7 +12,6 @@ interface TreatmentDetailPageProps {
   onNavigate: (slug: string) => void;
 }
 
-const FALLBACK_IMAGE = '/images/services/face-aesthetics/Image_28-06-26_at_12.57_PM.png';
 
 export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onNavigate }: TreatmentDetailPageProps) {
   const { t, tt, tCategoryName } = useI18n();
@@ -75,7 +74,7 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
                   category_id: null,
                   category_name: '',
                   price: 0,
-                  image_url: FALLBACK_IMAGE,
+                  image_url: '',
                   description: null,
                   is_popular: false,
                   is_premier: false,

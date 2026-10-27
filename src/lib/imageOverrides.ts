@@ -1,30 +1,6 @@
-// A distinct, relevant photo per treatment (no image repeats anywhere on the
-// site). Used when a treatment row has no image_url of its own.
-const px = (id: number) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
-
-export const TREATMENT_IMAGE_OVERRIDES: Record<string, string> = {
-  // Dental Care
-  'Teeth Cleaning': px(20301626),
-  'Teeth Whitening': px(14235198),
-  'Dental Implants': px(11768114),
-  // Face Aesthetics
-  'Botox Treatment': px(30809944),
-  'Dermal Fillers': px(3865548),
-  'Chemical Peel': px(6978043),
-  // MediFacials
-  'HydraFacial': px(7446659),
-  'Acne MediFacial': px(37229282),
-  // Hair Care
-  'PRP Hair Treatment': px(23349910),
-  'Hair Growth Therapy': px(38595833),
-  // Lip Aesthetics
-  'Lip Fillers': px(10816496),
-  'Lip Contouring': px(3762434),
-  // Laser Treatment
-  'Laser Hair Reduction': px(5069499),
-  'Laser Skin Resurfacing': px(4586750),
-};
+// Per-treatment images live in the centralized map in treatmentImages.ts —
+// one distinct, relevant photo per treatment, no reuse anywhere on the site.
+import { getMappedTreatmentImage } from './treatmentImages';
 
 export const CATEGORY_IMAGE_OVERRIDES: Record<string, string> = {
   'dental-care': '/images/services/dental-care/img-p-1-1.jpeg',
@@ -61,8 +37,12 @@ export function categoryFallbackImage(categoryNameOrSlug?: string | null): strin
 }
 
 export function getTreatmentImage(name: string, fallback: string, categoryName?: string | null): string {
-  if (TREATMENT_IMAGE_OVERRIDES[name]) return TREATMENT_IMAGE_OVERRIDES[name];
+  // 1) The curated per-treatment image (covers all menu + database treatments).
+  const mapped = getMappedTreatmentImage(name);
+  if (mapped) return mapped;
+  // 2) A real image_url from the database, if one is set.
   if (hasValue(fallback)) return fallback;
+  // 3) The treatment's category image as a last resort.
   return categoryFallbackImage(categoryName);
 }
 
