@@ -364,7 +364,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           </button>
 
           {/* Search bar */}
-          <div ref={searchRef} className="relative hidden md:flex w-24 lg:w-28 flex-shrink-0">
+          <div ref={searchRef} className="relative hidden md:flex w-44 2xl:w-64 flex-shrink-0">
             <div className="relative w-full">
               <input
                 type="text"
@@ -399,12 +399,9 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
             )}
           </div>
 
-          {/* Flexible space pushes the nav + Shop group to the right */}
-          <div className="hidden xl:block flex-1" />
-
-          {/* Nav links with mega menu */}
+          {/* Nav links with mega menu — spread evenly between search and Shop */}
           <nav
-            className="hidden xl:flex items-center justify-center gap-0.5"
+            className="hidden xl:flex flex-1 items-center justify-between gap-0.5"
             onMouseLeave={() => { setActiveMenu(null); setHoveredItem(null); }}
           >
             {NAV_LINKS.map(link => {
