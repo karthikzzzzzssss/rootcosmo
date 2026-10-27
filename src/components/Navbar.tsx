@@ -200,6 +200,21 @@ const NAV_KEY_BY_TREATMENT: Record<string, TranslationKey> = {
 const isNested = (item: MenuItem): item is { name: string; children: string[] } =>
   typeof item === 'object' && item !== null;
 
+// Flat list of every searchable treatment (menu items + nested leaves).
+const SEARCHABLE_TREATMENTS: string[] = (() => {
+  const cats = ['dental', 'skinAesthetics', 'mediFacials', 'hair', 'lipAesthetics', 'laser'];
+  const out = new Set<string>();
+  for (const c of cats) {
+    for (const group of MENU_GROUPS[c] ?? []) {
+      for (const item of group.items) {
+        if (typeof item === 'string') out.add(item);
+        else { out.add(item.name); item.children.forEach((ch) => out.add(ch)); }
+      }
+    }
+  }
+  return [...out];
+})();
+
 interface NavbarProps {
   onBookAppointment: () => void;
   onNavigate: (slug: string) => void;
@@ -216,6 +231,26 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
   const [mobileMenu, setMobileMenu] = useState<string | null>(null);
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const h = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+
+  const searchMatches = searchQuery.trim()
+    ? SEARCHABLE_TREATMENTS.filter((n) => n.toLowerCase().includes(searchQuery.trim().toLowerCase())).slice(0, 8)
+    : [];
+
+  const runSearch = (name: string) => {
+    onNavigateTreatment(name);
+    setSearchQuery('');
+    setSearchOpen(false);
+  };
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -289,7 +324,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
 
       <div className="relative max-w-[1400px] mx-auto px-4">
         {/* Main nav row */}
-        <div className="flex items-center gap-4 h-[68px]">
+        <div className="flex items-center gap-3 h-[68px]">
           {/* Logo — left */}
           <button onClick={onHome} className="flex-shrink-0 flex items-start gap-2 group">
             {/* Tooth-style icon */}
@@ -329,17 +364,39 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           </button>
 
           {/* Search bar */}
-          <div className="hidden md:flex w-48 lg:w-56 flex-shrink-0">
+          <div ref={searchRef} className="relative hidden md:flex w-36 lg:w-40 flex-shrink-0">
             <div className="relative w-full">
               <input
                 type="text"
                 placeholder={t('searchService')}
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+                onFocus={() => setSearchOpen(true)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && searchMatches.length) runSearch(searchMatches[0]);
+                  else if (e.key === 'Escape') setSearchOpen(false);
+                }}
                 className="w-full bg-white text-gray-800 placeholder-gray-500 text-sm px-4 py-2 pr-9 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
               <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
+            {searchOpen && searchQuery.trim() && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl shadow-2xl border border-purple-100 py-1 z-[80] max-h-80 overflow-y-auto">
+                {searchMatches.length > 0 ? (
+                  searchMatches.map(name => (
+                    <button
+                      key={name}
+                      onClick={() => runSearch(name)}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                    >
+                      {menuItemLabel(name)}
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-4 py-2 text-sm text-gray-400">No services found</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Nav links with mega menu — centered in remaining space */}
@@ -363,7 +420,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
                     }}
                     aria-expanded={isActive}
                     aria-haspopup={groups.length > 0}
-                    className={`flex items-center gap-0.5 text-[13px] font-medium px-3 py-2 transition-colors whitespace-nowrap ${isActive || getNavKeyForTreatment('') === link.label ? 'text-purple-200' : 'text-white hover:text-purple-200'}`}
+                    className={`flex items-center gap-0.5 text-[12px] font-medium px-1 py-2 transition-colors whitespace-nowrap ${isActive || getNavKeyForTreatment('') === link.label ? 'text-purple-200' : 'text-white hover:text-purple-200'}`}
                   >
                     {t(link.label)}
                     {groups.length > 0 && <ChevronDown size={12} className={`text-purple-300 transition-transform ${isActive ? 'rotate-180' : ''}`} />}
@@ -488,11 +545,10 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
 
           <div className="hidden xl:block flex-1" />
 
-          {/* Export Excel button — admin only */}
+          {/* Shop at RootCosmo — only when there is room (wide screens) */}
           <a
-            href="http://localhost:4000/api/appointments/export/excel"
-            download
-            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90"
+            href="/#products"
+            className="hidden min-[1700px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3.5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%)',
               boxShadow: '0 2px 16px rgba(147,51,234,0.6)',
@@ -506,7 +562,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           {/* Book Appointment CTA — right */}
           <button
             onClick={onBookAppointment}
-            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90"
+            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3.5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #ca8a04 0%, #eab308 100%)',
               boxShadow: '0 2px 12px rgba(234,179,8,0.45)',
