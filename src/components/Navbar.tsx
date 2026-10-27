@@ -399,9 +399,12 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
             )}
           </div>
 
-          {/* Nav links with mega menu — centered in remaining space */}
+          {/* Flexible space pushes the nav + Shop group to the right */}
+          <div className="hidden xl:block flex-1" />
+
+          {/* Nav links with mega menu */}
           <nav
-            className="hidden xl:flex flex-1 items-center justify-center gap-0.5"
+            className="hidden xl:flex items-center justify-center gap-0.5"
             onMouseLeave={() => { setActiveMenu(null); setHoveredItem(null); }}
           >
             {NAV_LINKS.map(link => {
@@ -542,8 +545,6 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
               );
             })}
           </nav>
-
-          <div className="hidden xl:block flex-1" />
 
           {/* Shop at RootCosmo — only when there is room (wide screens) */}
           <a
