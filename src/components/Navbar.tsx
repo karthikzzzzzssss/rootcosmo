@@ -324,7 +324,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
 
       <div className="relative max-w-[1400px] mx-auto px-4">
         {/* Main nav row */}
-        <div className="flex items-center gap-3 h-[68px]">
+        <div className="flex items-center gap-2 h-[68px]">
           {/* Logo — left */}
           <button onClick={onHome} className="flex-shrink-0 flex items-start gap-2 group">
             {/* Tooth-style icon */}
@@ -364,7 +364,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           </button>
 
           {/* Search bar */}
-          <div ref={searchRef} className="relative hidden md:flex w-36 lg:w-40 flex-shrink-0">
+          <div ref={searchRef} className="relative hidden md:flex w-28 lg:w-32 flex-shrink-0">
             <div className="relative w-full">
               <input
                 type="text"
@@ -548,7 +548,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           {/* Shop at RootCosmo — only when there is room (wide screens) */}
           <a
             href="/#products"
-            className="hidden min-[1700px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3.5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
+            className="hidden min-[1460px]:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%)',
               boxShadow: '0 2px 16px rgba(147,51,234,0.6)',
@@ -562,7 +562,7 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
           {/* Book Appointment CTA — right */}
           <button
             onClick={onBookAppointment}
-            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3.5 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
+            className="hidden md:flex items-center gap-2 flex-shrink-0 text-white text-sm font-semibold px-3 py-2.5 rounded-full transition-all duration-200 hover:opacity-90 whitespace-nowrap"
             style={{
               background: 'linear-gradient(135deg, #ca8a04 0%, #eab308 100%)',
               boxShadow: '0 2px 12px rgba(234,179,8,0.45)',

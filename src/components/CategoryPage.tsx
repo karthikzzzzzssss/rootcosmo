@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import type { Category, Treatment } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { getTreatmentImage, categoryFallbackImage } from '../lib/imageOverrides';
+import { servicesForCategory, serviceCount } from '../lib/services';
 
 interface CategoryPageProps {
   slug: string;
@@ -125,6 +126,29 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
 
   const heroImg = meta.heroImage;
 
+  // The full service list for this category (matches rootcosmo.com). Uses the
+  // matching database row where one exists (for price), otherwise a lightweight
+  // service object so every listed service renders with its own mapped image.
+  const categoryName = currentCat?.name ?? slugToCategoryName(slug);
+  const serviceNames = servicesForCategory(slug);
+  let displayTreatments: Treatment[] = serviceNames.map((name, i) => {
+    const dbMatch = treatments.find(t => t.name === name);
+    return dbMatch ?? {
+      id: `svc-${slug}-${i}`,
+      name,
+      category_id: null,
+      category_name: categoryName,
+      price: 0,
+      image_url: '',
+      description: null,
+      is_popular: false,
+      is_premier: false,
+      created_at: '',
+    } as Treatment;
+  });
+  if (serviceNames.length === 0) displayTreatments = treatments; // fallback to DB
+  if (sortBy === 'name') displayTreatments = [...displayTreatments].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Banner — immersive, full-bleed */}
@@ -212,7 +236,7 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
             </a>
             <div className="flex items-center gap-2 text-white/80 text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="text-2xl font-extrabold text-white">{currentCat?.service_count ?? 0}</span>
+                <span className="text-2xl font-extrabold text-white">{serviceCount(slug)}</span>
                 <span className="text-purple-200/80 text-xs uppercase tracking-widest font-medium">{t('services')}</span>
               </div>
             </div>
@@ -309,7 +333,7 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
             </div>
 
             {/* Treatment Cards Grid */}
-            {loading ? (
+            {loading && displayTreatments.length === 0 ? (
               <div className={`grid ${gridColClass} gap-4`}>
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="animate-pulse bg-white rounded-xl overflow-hidden shadow-sm">
@@ -325,7 +349,7 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
               </div>
             ) : (
               <div className={`grid ${gridColClass} gap-4 md:gap-5`}>
-                {treatments.map(treatment => (
+                {displayTreatments.map(treatment => (
                   <div
                     key={treatment.id}
                     className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 group flex flex-col"

@@ -145,6 +145,84 @@ export const TREATMENT_IMAGES: Record<string, string> = {
   'Laser Hair Reduction': px(3985354),
 };
 
+// Full rootcosmo.com service set (67 services) shown on the category pages.
+// Distinct image within each category so a category page never repeats a photo.
+export const SERVICE_IMAGES: Record<string, string> = {
+  // Dental Care (22)
+  'Dental Apicoectomy': px(6629364),
+  'Dental Bridges & Crowns': px(6502340),
+  'Dental Cleanings (Prophylaxis)': px(20301626),
+  'Dental Fillings (GIC & Composites)': px(6529216),
+  'Dental Implants': px(6502305),
+  'Dental Inlays and Onlays': px(4687905),
+  'Dental Sealants': px(6502343),
+  'Dental Veneers': px(6627571),
+  'Dentures (Complete or Partial)': px(6812500),
+  'Full Mouth Rehabilitation': px(6502306),
+  'Gum Disease (Periodontics) Treatment': px(6528909),
+  'Impaction (Surgical Removal)': px(6528908),
+  'Invisible Braces (Invisalign)': px(19147369),
+  'Laser Flap Surgeries': px(13207323),
+  'Orthodontic (Braces or Aligners) Treatment': px(5524024),
+  'Pediatric Dentistry (Child Dentistry)': px(19775904),
+  'Root Canal Treatment (Endodontics)': px(6627606),
+  'Smile Designing': px(6627281),
+  'Temporomandibular Joint (TMJ) Treatment': px(6502309),
+  'Teeth Whitening (Bleaching)': px(5355891),
+  'Tooth Removal (Extraction)': px(7787976),
+  'Zirconia Crowns': px(6627564),
+  // Face Aesthetics (25)
+  'Acne (Pimples) Treatment': px(5588005),
+  'Acne Scars Treatment': px(9253774),
+  'Anti-Aging Treatments': px(36436447),
+  'Botox (Botulinum Toxin) Injections': px(7581590),
+  'Carbon Laser Peel (Hollywood Peel)': px(8406612),
+  'Chemical Peels': px(6978043),
+  'Dermal Fillers': px(4586708),
+  'Double Chin Reduction': px(7582560),
+  'Facial Rejuvenation': px(37229299),
+  'GFC (Growth Factor Concentration) for Skin': px(29648624),
+  'Hyperhidrosis (Excessive Sweating) Treatment': px(16131212),
+  'IV Glutathione Treatment': px(16131210),
+  'Keloid and Hypertrophic Scar Treatment': px(5587975),
+  'Melasma': px(6476076),
+  'Microdermabrasion (MDM)': px(8076226),
+  'Microneedling (MNRF)': px(7363189),
+  'Mole and Skin Tag Removal': px(6337548),
+  'Open Pores': px(6925542),
+  'Pigmentation': px(6475980),
+  'Platelet-Rich Plasma (PRP) Therapy for Skin': px(27666913),
+  'Skin Lightening and Brightening': px(9775369),
+  'Skin Tightening': px(34775442),
+  'Stretch Marks': px(7588575),
+  'Thread Lifts': px(30809943),
+  'Under Eye Dark Circle Reduction': px(6635915),
+  // MediFacials (5)
+  'Body Polishing': px(10976267),
+  'Crystal Microdermabrasion (MDM)': px(20683632),
+  'Hydrafacial': px(18209809),
+  'Oxygeno Facial': px(7755657),
+  'Vampire Facial': px(37229279),
+  // Hair Care (7)
+  'Anti-Dandruff Treatment': px(23349891),
+  'GFC for Hair': px(3993451),
+  'Hair Loss Treatments': px(23349912),
+  'Hair Transplantation': px(27138339),
+  'Laser Hair Therapy': px(7755473),
+  'Mesotherapy for Hair': px(8834042),
+  'PRP Therapy for Hair': px(23349910),
+  // Lip Aesthetics (3)
+  'Lip Fillers': px(10816496),
+  'Lip Pigmentation': px(7290745),
+  'Lip Rejuvenation': px(7290642),
+  // Laser Treatment (5)
+  'Laser Hair Reduction': px(3985354),
+  'Laser Scar Reduction': px(29021129),
+  'Laser Skin Resurfacing': px(5069499),
+  'Laser Tattoo Removal': px(16032298),
+  'Laser Toning': px(35103885),
+};
+
 // Slug index so a treatment resolves the same whether it arrives as its exact
 // name (menu click) or as a deslugified name from the URL (direct load /
 // refresh), e.g. "Nd:YAG Laser" and "Nd Yag Laser" both map to "nd-yag-laser".
@@ -157,11 +235,11 @@ function slugify(value: string): string {
 }
 
 const SLUG_INDEX: Record<string, string> = {};
-for (const [name, url] of Object.entries(TREATMENT_IMAGES)) {
+for (const [name, url] of [...Object.entries(TREATMENT_IMAGES), ...Object.entries(SERVICE_IMAGES)]) {
   const s = slugify(name);
   if (!(s in SLUG_INDEX)) SLUG_INDEX[s] = url;
 }
 
 export function getMappedTreatmentImage(name: string): string | undefined {
-  return TREATMENT_IMAGES[name] ?? SLUG_INDEX[slugify(name)];
+  return TREATMENT_IMAGES[name] ?? SERVICE_IMAGES[name] ?? SLUG_INDEX[slugify(name)];
 }

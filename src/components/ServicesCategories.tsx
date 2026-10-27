@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { Category } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { getCategoryImage } from '../lib/imageOverrides';
+import { serviceCount } from '../lib/services';
 
 interface ServicesCategoriesProps {
   onNavigate: (slug: string) => void;
@@ -64,7 +65,7 @@ export default function ServicesCategories({ onNavigate }: ServicesCategoriesPro
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 </div>
                 <p className="font-bold text-gray-900 text-xs md:text-sm uppercase tracking-wide">{tCategoryName(cat.slug)}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{cat.service_count} {t('services')}</p>
+                <p className="text-gray-500 text-xs mt-0.5">{serviceCount(cat.slug)} {t('services')}</p>
               </button>
             ))}
           </div>
