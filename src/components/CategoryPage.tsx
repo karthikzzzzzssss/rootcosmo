@@ -10,6 +10,7 @@ interface CategoryPageProps {
   slug: string;
   categories: Category[];
   onNavigate: (slug: string) => void;
+  onNavigateTreatment?: (name: string) => void;
   onBack: () => void;
   onBook: (treatment: Treatment) => void;
 }
@@ -68,7 +69,7 @@ const CATEGORY_META: Record<string, CategoryHero> = {
 
 type GridSize = 2 | 3 | 4;
 
-export default function CategoryPage({ slug, categories, onNavigate, onBack, onBook }: CategoryPageProps) {
+export default function CategoryPage({ slug, categories, onNavigate, onNavigateTreatment, onBack, onBook }: CategoryPageProps) {
   const { t, tt, tCategoryName, tCategoryDesc } = useI18n();
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -365,14 +366,22 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
                           const fb = categoryFallbackImage(treatment.category_name);
                           if (!e.currentTarget.src.endsWith(fb)) e.currentTarget.src = fb;
                         }}
-                        className="w-full h-48 object-cover brightness-105 saturate-105 group-hover:scale-105 group-hover:brightness-110 transition-all duration-300"
+                        onClick={() => onNavigateTreatment?.(treatment.name)}
+                        className="w-full h-48 object-cover brightness-105 saturate-105 group-hover:scale-105 group-hover:brightness-110 transition-all duration-300 cursor-pointer"
                       />
-                      <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-purple-700 text-white flex items-center justify-center text-xs font-bold hover:bg-purple-800 transition-colors shadow">
+                      <button
+                        onClick={() => onNavigateTreatment?.(treatment.name)}
+                        title="View details"
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-purple-700 text-white flex items-center justify-center text-xs font-bold hover:bg-purple-800 transition-colors shadow"
+                      >
                         i
                       </button>
                     </div>
                     <div className="p-4 flex flex-col flex-1">
-                      <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-1">
+                      <h3
+                        onClick={() => onNavigateTreatment?.(treatment.name)}
+                        className="font-semibold text-gray-900 text-sm leading-snug mb-1 cursor-pointer hover:text-purple-700 transition-colors"
+                      >
                         {tt(treatment.name)}
                       </h3>
                       <p className="text-gray-400 text-xs mb-2">{tt(treatment.category_name)}</p>

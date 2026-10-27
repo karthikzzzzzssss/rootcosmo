@@ -139,6 +139,7 @@ function AppContent() {
             slug={route.slug}
             categories={categories}
             onNavigate={navigateTo}
+            onNavigateTreatment={navigateToTreatment}
             onBack={goHome}
             onBook={openModal}
           />
