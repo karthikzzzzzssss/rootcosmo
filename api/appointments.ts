@@ -65,7 +65,12 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const treatmentId = typeof body?.treatment_id === 'string' ? body.treatment_id : null;
+  // Only keep treatment_id when it's a real DB UUID. Code-generated services
+  // (e.g. "svc-dental-care-15") are not rows in the treatments table and would
+  // break the uuid column; the treatment_name below still records the service.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const rawTreatmentId = typeof body?.treatment_id === 'string' ? body.treatment_id : null;
+  const treatmentId = rawTreatmentId && UUID_RE.test(rawTreatmentId) ? rawTreatmentId : null;
   const treatmentName = typeof body?.treatment_name === 'string' ? body.treatment_name : null;
   const notes = typeof body?.notes === 'string' ? body.notes.trim() || null : null;
 
