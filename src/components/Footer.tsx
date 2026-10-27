@@ -26,6 +26,16 @@ const SERVICE_TREATMENT_NAMES: Record<string, string> = {
   'Laser Hair Removal':    'Laser Hair Removal',
 };
 
+// Full service lists per category, mirroring rootcosmo.com's footer.
+const SERVICE_COLUMNS: { title: string; slug: string; items: string[] }[] = [
+  { title: 'Dental', slug: 'dental-care', items: ['Apicoectomy', 'Dental Bridges & Crowns', 'Dental Cleanings', 'Dental Fillings', 'Dental Implants', 'Dental Sealants', 'Dental Veneers'] },
+  { title: 'Skin Aesthetics', slug: 'face-aesthetics', items: ['Acne (Pimples) Treatment', 'Acne Scars Treatment', 'Anti-Aging Treatment', 'Botox Injections', 'Carbon Peel', 'Chemical Peels', 'Dark Circles'] },
+  { title: 'MediFacials', slug: 'medifacials', items: ['Body Polishing', 'Crystal MDM', 'Hydrafacial', 'Oxygen Facial', 'Vampire Facial'] },
+  { title: 'Hair Aesthetics', slug: 'hair-care', items: ['Anti-Dandruff Treatment', 'GFC for Hair', 'Hair Transplantation', 'Hair Loss Treatments', 'Laser Hair Therapy', 'Mesotherapy for Hair', 'PRP Therapy for Hair'] },
+  { title: 'Lip Aesthetics', slug: 'lip-aesthetics', items: ['Lip Rejuvenation', 'Lip Fillers', 'Lip Pigmentation'] },
+  { title: 'Laser Treatment', slug: 'laser-treatment', items: ['Laser Scar Reduction', 'Laser Hair Reduction', 'Laser Skin Resurfacing', 'Laser Tattoo Removal', 'Laser Toning'] },
+];
+
 interface FooterProps {
   onNavigate: (slug: string) => void;
   onNavigateTreatment: (name: string) => void;
@@ -163,6 +173,43 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Services by category — mirrors rootcosmo.com */}
+        <div className="border-t border-purple-800/60 pt-10 mb-10">
+          <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-6">Explore RootCosmo</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {SERVICE_COLUMNS.map((col) => (
+              <div key={col.title}>
+                <button
+                  onClick={() => onNavigate(col.slug)}
+                  className="text-white font-semibold text-sm mb-3 hover:text-yellow-300 transition-colors text-left"
+                >
+                  {col.title}
+                </button>
+                <ul className="space-y-1.5">
+                  {col.items.map((item) => (
+                    <li key={item}>
+                      <button
+                        onClick={() => onNavigate(col.slug)}
+                        className="text-gray-400 text-xs hover:text-yellow-300 transition-colors text-left"
+                      >
+                        {item}
+                      </button>
+                    </li>
+                  ))}
+                  <li>
+                    <button
+                      onClick={() => onNavigate(col.slug)}
+                      className="mt-1 text-purple-300 text-xs font-semibold hover:text-yellow-300 transition-colors text-left"
+                    >
+                      View All Services
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
