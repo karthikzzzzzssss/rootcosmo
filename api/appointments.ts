@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { createClient } from '@supabase/supabase-js';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -86,32 +87,22 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
   }
 
   let emailSent = false;
-  const apiKey = process.env.RESEND_API_KEY;
-  // Accept either name: the Vercel project defines FROM_EMAIL, older config used EMAIL_FROM.
-  const from = process.env.EMAIL_FROM || process.env.FROM_EMAIL;
 
-  if (!apiKey || !from) {
-    console.error('Appointment saved, but RESEND_API_KEY or the sender (FROM_EMAIL/EMAIL_FROM) is missing.');
-  } else {
-    const resend = new Resend(apiKey);
-    const patientNameHtml = escapeHtml(patientName);
-    const phoneHtml = escapeHtml(phone);
-    const treatmentHtml = treatmentName ? escapeHtml(treatmentName) : null;
-    const dateHtml = escapeHtml(appointmentDate);
-    const timeHtml = escapeHtml(appointmentTime);
-    const notesHtml = notes ? escapeHtml(notes) : null;
-    const clinicPhone = process.env.CLINIC_PHONE;
-    const clinicEmail = process.env.CLINIC_EMAIL;
-    const changeContact = clinicPhone || clinicEmail;
+  const clinicPhone = process.env.CLINIC_PHONE;
+  const clinicEmail = process.env.CLINIC_EMAIL;
+  const changeContact = clinicPhone || clinicEmail;
 
-    try {
-      const result = await resend.emails.send({
-        from,
-        replyTo: from,
-        to: [email],
-        subject: 'Your RootCosmo Appointment Confirmation',
-        text: `Hello ${patientName}, your appointment has been booked for ${appointmentDate} at ${appointmentTime}.${treatmentName ? ` Service: ${treatmentName}.` : ''}${changeContact ? ` To make a change, contact the clinic at ${changeContact}.` : ' To make a change, please contact the clinic.'}`,
-        html: `
+  // Shared message content (used by whichever transport is active).
+  const patientNameHtml = escapeHtml(patientName);
+  const phoneHtml = escapeHtml(phone);
+  const treatmentHtml = treatmentName ? escapeHtml(treatmentName) : null;
+  const dateHtml = escapeHtml(appointmentDate);
+  const timeHtml = escapeHtml(appointmentTime);
+  const notesHtml = notes ? escapeHtml(notes) : null;
+
+  const patientSubject = 'Your RootCosmo Appointment Confirmation';
+  const patientText = `Hello ${patientName}, your appointment has been booked for ${appointmentDate} at ${appointmentTime}.${treatmentName ? ` Service: ${treatmentName}.` : ''}${changeContact ? ` To make a change, contact the clinic at ${changeContact}.` : ' To make a change, please contact the clinic.'}`;
+  const patientHtml = `
           <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;color:#1f2937">
             <h1 style="color:#5b0fa8;margin-bottom:8px">RootCosmo</h1>
             <p style="margin-top:0;color:#6b7280">RootCosmo Clinic, Hyderabad</p>
@@ -127,7 +118,72 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
             ${clinicPhone ? `<p>Clinic contact: <strong>${escapeHtml(clinicPhone)}</strong></p>` : ''}
             <p>If you need to change your appointment, please contact the clinic.</p>
           </div>
-        `,
+        `;
+  const clinicSubject = 'New RootCosmo appointment';
+  const clinicText = `Patient: ${patientName}\nEmail: ${email}\nPhone: ${phone}\n${treatmentName ? `Service: ${treatmentName}\n` : ''}Date: ${appointmentDate}\nTime: ${appointmentTime}${notes ? `\nNotes: ${notes}` : ''}`;
+
+  // Transport selection. Prefer SMTP (e.g. Hostinger) when configured: it sends
+  // from a real authenticated mailbox and needs no Resend domain verification.
+  // Fall back to Resend only when SMTP is not configured.
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+  const resendKey = process.env.RESEND_API_KEY;
+  const resendFrom = process.env.EMAIL_FROM || process.env.FROM_EMAIL;
+
+  if (smtpHost && smtpUser && smtpPass) {
+    // Most SMTP providers require the From to match the authenticated mailbox.
+    const fromHeader = `RootCosmo <${smtpUser}>`;
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+      });
+
+      const info = await transporter.sendMail({
+        from: fromHeader,
+        replyTo: smtpUser,
+        to: email,
+        subject: patientSubject,
+        text: patientText,
+        html: patientHtml,
+      });
+
+      if (info.accepted && info.accepted.length > 0) {
+        emailSent = true;
+        console.info('SMTP accepted the patient confirmation email.', { messageId: info.messageId });
+      } else {
+        console.error('SMTP did not accept the patient confirmation email.', { rejected: info.rejected });
+      }
+
+      if (clinicEmail) {
+        try {
+          await transporter.sendMail({
+            from: fromHeader,
+            to: clinicEmail,
+            subject: clinicSubject,
+            text: clinicText,
+          });
+        } catch (error) {
+          console.error('SMTP clinic notification failed:', error instanceof Error ? error.message : 'Unknown email error');
+        }
+      }
+    } catch (error) {
+      console.error('SMTP patient confirmation email failed:', error instanceof Error ? error.message : 'Unknown email error');
+    }
+  } else if (resendKey && resendFrom) {
+    const resend = new Resend(resendKey);
+    try {
+      const result = await resend.emails.send({
+        from: resendFrom,
+        replyTo: resendFrom,
+        to: [email],
+        subject: patientSubject,
+        text: patientText,
+        html: patientHtml,
       });
 
       if (result.error) {
@@ -145,10 +201,10 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
     if (clinicEmail) {
       try {
         const clinicResult = await resend.emails.send({
-          from,
+          from: resendFrom,
           to: [clinicEmail],
-          subject: 'New RootCosmo appointment',
-          text: `Patient: ${patientName}\nEmail: ${email}\nPhone: ${phone}\n${treatmentName ? `Service: ${treatmentName}\n` : ''}Date: ${appointmentDate}\nTime: ${appointmentTime}${notes ? `\nNotes: ${notes}` : ''}`,
+          subject: clinicSubject,
+          text: clinicText,
         });
         if (clinicResult.error) {
           console.error('Resend rejected the clinic notification email:', clinicResult.error.message);
@@ -157,6 +213,8 @@ export default async function handler(req: AppointmentRequest, res: AppointmentR
         console.error('Clinic appointment notification failed:', error instanceof Error ? error.message : 'Unknown email error');
       }
     }
+  } else {
+    console.error('Appointment saved, but no email transport is configured (set SMTP_* or RESEND_API_KEY + FROM_EMAIL/EMAIL_FROM).');
   }
 
   return res.status(201).json({

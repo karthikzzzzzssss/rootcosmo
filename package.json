@@ -14,12 +14,14 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
+    "@types/nodemailer": "^6.4.17",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.344.0",
-    "resend": "^6.34.1",
+    "nodemailer": "^6.9.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.18.2"
+    "react-router-dom": "^7.18.2",
+    "resend": "^6.34.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
