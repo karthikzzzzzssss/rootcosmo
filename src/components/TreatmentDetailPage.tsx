@@ -53,7 +53,7 @@ export default function TreatmentDetailPage({ treatmentName, onBack, onBook, onN
             name: treatmentName,
             category_id: null,
             category_name: '',
-            price: 0,
+            price: 399,
             image_url: '',
             description: null,
             is_popular: false,

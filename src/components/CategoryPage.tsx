@@ -133,18 +133,19 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
   const serviceNames = servicesForCategory(slug);
   let displayTreatments: Treatment[] = serviceNames.map((name, i) => {
     const dbMatch = treatments.find(t => t.name === name);
-    return dbMatch ?? {
+    const base = dbMatch ?? {
       id: `svc-${slug}-${i}`,
       name,
       category_id: null,
       category_name: categoryName,
-      price: 0,
+      price: 399,
       image_url: '',
       description: null,
       is_popular: false,
       is_premier: false,
       created_at: '',
     } as Treatment;
+    return { ...base, price: 399 } as Treatment; // every service priced at 399
   });
   if (serviceNames.length === 0) displayTreatments = treatments; // fallback to DB
   if (sortBy === 'name') displayTreatments = [...displayTreatments].sort((a, b) => a.name.localeCompare(b.name));
@@ -290,7 +291,7 @@ export default function CategoryPage({ slug, categories, onNavigate, onBack, onB
             {/* Controls bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <p className="text-gray-600 text-sm font-medium">
-                {loading ? t('loading') : `${t('showingResults')} ${treatments.length}`}
+                {`${t('showingResults')} ${displayTreatments.length}`}
               </p>
 
               <div className="flex items-center gap-3 flex-wrap">
