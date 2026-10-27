@@ -14,6 +14,7 @@ import PremierTreatments from './components/PremierTreatments';
 import PopularTreatments from './components/PopularTreatments';
 import WhyChooseUs from './components/WhyChooseUs';
 import ProductsSection from './components/ProductsSection';
+import BlogSection from './components/BlogSection';
 import AppointmentModal from './components/AppointmentModal';
 import CategoryPage from './components/CategoryPage';
 import TreatmentDetailPage from './components/TreatmentDetailPage';
@@ -163,6 +164,7 @@ function AppContent() {
             <WhyChooseUs onBookAppointment={() => openModal()} />
             <PopularTreatments onBook={openModal} onBookAppointment={() => openModal()} onViewAll={() => navigateTo('face-aesthetics')} />
             <ProductsSection onNavigate={navigateTo} />
+            <BlogSection />
           </>
         )}
       </main>
