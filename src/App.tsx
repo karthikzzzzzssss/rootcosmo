@@ -170,7 +170,7 @@ function AppContent() {
         )}
       </main>
 
-      <Footer onNavigate={navigateTo} onNavigateTreatment={navigateToTreatment} />
+      <Footer onNavigate={navigateTo} onNavigateTreatment={navigateToTreatment} onHome={goHome} />
 
       <AppointmentModal
         isOpen={modalOpen}

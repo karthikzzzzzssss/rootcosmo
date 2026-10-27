@@ -10,9 +10,19 @@ const QUICK_LINK_ACTIONS: Record<string, { type: 'category'; slug: string } | { 
   'Lip Aesthetics':   { type: 'category', slug: 'lip-aesthetics' },
   'Laser Treatments': { type: 'category', slug: 'laser-treatment' },
   'MediFacials':      { type: 'category', slug: 'medifacials' },
-  'Gallery':          { type: 'scroll',   id: 'gallery' },
+  // No standalone gallery section exists; point to the visual Premier Treatments showcase.
+  'Gallery':          { type: 'scroll',   id: 'premier' },
+  // The footer itself carries the contact details (id="contact" below).
   'Contact':          { type: 'scroll',   id: 'contact' },
 };
+
+// Official RootCosmo profiles and location (from rootcosmo.com).
+const SOCIAL_LINKS = {
+  facebook:  'https://www.facebook.com/rootcosmo',
+  instagram: 'https://www.instagram.com/rootcosmo',
+  youtube:   'https://www.youtube.com/channel/UCv_Ox5OtN952Y4KoqZNrMcQ',
+};
+const MAPS_URL = 'https://maps.app.goo.gl/q9ew1fuTEh4BnYLE8';
 
 const SERVICE_TREATMENT_NAMES: Record<string, string> = {
   'Laser Flap Surgeries':  'Laser Flap Surgeries',
@@ -39,13 +49,32 @@ const SERVICE_COLUMNS: { title: string; slug: string; items: string[] }[] = [
 interface FooterProps {
   onNavigate: (slug: string) => void;
   onNavigateTreatment: (name: string) => void;
+  onHome: () => void;
 }
 
-export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps) {
+export default function Footer({ onNavigate, onNavigateTreatment, onHome }: FooterProps) {
   const { t, lang } = useI18n();
 
   const englishQuickLinks = FOOTER_LINKS.en;
   const englishServices = FOOTER_SERVICES.en;
+
+  // Scroll to a home-page section. If it isn't in the DOM (we're on a category or
+  // treatment page), go home first, then scroll once the section has rendered.
+  const scrollToSection = (id: string) => {
+    const existing = document.getElementById(id);
+    if (existing) {
+      existing.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    onHome();
+    let tries = 0;
+    const tick = () => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      else if (tries++ < 30) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
 
   const handleQuickLink = (index: number) => {
     const action = QUICK_LINK_ACTIONS[englishQuickLinks[index]];
@@ -53,8 +82,7 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
     if (action.type === 'category') {
       onNavigate(action.slug);
     } else {
-      const el = document.getElementById(action.id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      scrollToSection(action.id);
     }
   };
 
@@ -64,6 +92,7 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
   };
   return (
     <footer
+      id="contact"
       className="text-gray-300 pt-14 pb-6"
       style={{ background: 'linear-gradient(135deg, #1a0030 0%, #2d0060 100%)' }}
     >
@@ -91,13 +120,13 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
               {t('footerDesc')}
             </p>
             <div className="flex gap-3 mt-5">
-              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+              <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" aria-label="RootCosmo on Facebook" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
                 <Facebook size={15} />
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+              <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="RootCosmo on Instagram" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
                 <Instagram size={15} />
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
+              <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" aria-label="RootCosmo on YouTube" className="w-8 h-8 rounded-full bg-purple-800 flex items-center justify-center hover:bg-purple-600 transition-colors">
                 <Youtube size={15} />
               </a>
             </div>
@@ -151,7 +180,7 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="text-yellow-400 flex-shrink-0 mt-0.5" />
-                <p className="text-gray-400 text-sm">{t('hyderabad')}</p>
+                <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 text-sm hover:text-yellow-300 transition-colors">{t('hyderabad')}</a>
               </div>
               <div className="flex items-center gap-3">
                 <Phone size={16} className="text-yellow-400 flex-shrink-0" />
@@ -192,7 +221,7 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
                   {col.items.map((item) => (
                     <li key={item}>
                       <button
-                        onClick={() => onNavigate(col.slug)}
+                        onClick={() => onNavigateTreatment(item)}
                         className="text-gray-400 text-xs hover:text-yellow-300 transition-colors text-left"
                       >
                         {item}
@@ -217,9 +246,9 @@ export default function Footer({ onNavigate, onNavigateTreatment }: FooterProps)
         <div className="border-t border-purple-800/60 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-500">
           <p>&copy; {new Date().getFullYear()} {t('allRightsReserved')}</p>
           <div className="flex gap-4">
-            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('privacyPolicy')}</button>
-            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('termsOfService')}</button>
-            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-gray-300 transition-colors">{t('sitemap')}</button>
+            <button onClick={() => scrollToSection('about')} className="hover:text-gray-300 transition-colors">{t('privacyPolicy')}</button>
+            <button onClick={() => scrollToSection('about')} className="hover:text-gray-300 transition-colors">{t('termsOfService')}</button>
+            <button onClick={() => scrollToSection('services')} className="hover:text-gray-300 transition-colors">{t('sitemap')}</button>
           </div>
         </div>
       </div>

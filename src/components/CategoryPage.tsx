@@ -277,7 +277,7 @@ export default function CategoryPage({ slug, categories, onNavigate, onNavigateT
                             isActive ? 'bg-white text-purple-800' : 'bg-purple-900 text-white'
                           }`}
                         >
-                          {cat.service_count}
+                          {serviceCount(cat.slug)}
                         </span>
                       </button>
                     </li>
