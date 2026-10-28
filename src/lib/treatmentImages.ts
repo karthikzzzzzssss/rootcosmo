@@ -155,7 +155,7 @@ export const SERVICE_IMAGES: Record<string, string> = {
   'Dental Fillings (GIC & Composites)': px(6529216),
   'Dental Implants': px(6502305),
   'Dental Inlays and Onlays': px(4687905),
-  'Dental Sealants': px(6502343),
+  'Dental Sealants': px(6529111),
   'Dental Veneers': px(6627571),
   'Dentures (Complete or Partial)': px(6812500),
   'Full Mouth Rehabilitation': px(6502306),
