@@ -132,7 +132,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   autoComplete="name"
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 caret-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Your name"
                 />
               </div>
@@ -146,7 +146,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 caret-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="you@example.com"
               />
             </div>
@@ -160,7 +160,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-11 text-sm text-gray-900 placeholder-gray-400 caret-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder={mode === 'register' ? 'At least 6 characters' : '••••••••'}
                 />
                 <button
