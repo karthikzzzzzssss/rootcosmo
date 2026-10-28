@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Phone, Mail, Clock, Facebook, Instagram, Youtube, ChevronDown, Check } from 'lucide-react';
+import { Phone, Mail, Clock, Facebook, Instagram, Youtube, ChevronDown, Check, LogOut } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import { LANGUAGES, type LangCode } from '../i18n/translations';
+import { useAuth } from '../lib/AuthContext';
+import AuthModal from './AuthModal';
 
 function WhatsAppIcon() {
   return (
@@ -27,6 +29,13 @@ export default function TopBar() {
   }, []);
 
   const currentLang = LANGUAGES.find(l => l.code === lang) ?? LANGUAGES[0];
+
+  const { user, signOut } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined)?.split(' ')[0] ||
+    user?.email?.split('@')[0] ||
+    '';
 
   const handleSelectLang = (code: LangCode) => {
     setLang(code);
@@ -101,15 +110,39 @@ export default function TopBar() {
             <a href="#" className="hover:text-green-400 transition-colors"><WhatsAppIcon /></a>
           </div>
 
-          {/* Login */}
-          <button className="hidden md:flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors whitespace-nowrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            {t('loginRegister')}
-          </button>
+          {/* Login / account */}
+          {user ? (
+            <div className="hidden md:flex items-center gap-2 whitespace-nowrap">
+              <span className="flex items-center gap-1.5 text-gray-200">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span className="max-w-[120px] truncate">Hi, {displayName}</span>
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+                title="Log out"
+              >
+                <LogOut size={13} /> Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="hidden md:flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors whitespace-nowrap"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              {t('loginRegister')}
+            </button>
+          )}
         </div>
+
+        <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
       </div>
     </div>
   );

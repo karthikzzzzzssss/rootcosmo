@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from './lib/supabase';
 import type { Treatment, Category } from './types';
 import { I18nProvider, useI18n } from './i18n/I18nContext';
+import { AuthProvider } from './lib/AuthContext';
 import { categoryPath, treatmentPath, deslugify } from './lib/routes';
 
 import TopBar from './components/TopBar';
@@ -196,7 +197,9 @@ function AppContent() {
 export default function App() {
   return (
     <I18nProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </I18nProvider>
   );
 }
