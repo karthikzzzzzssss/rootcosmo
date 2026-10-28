@@ -51,12 +51,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     try {
       if (mode === 'login') {
         const { error } = await signIn(email, password);
-        if (error) setError(error);
-        else close();
+        if (error) {
+          setError(
+            /invalid login credentials/i.test(error)
+              ? "Email or password is incorrect. If you haven't registered yet, switch to the Register tab above."
+              : error
+          );
+        } else {
+          close();
+        }
       } else {
         const { error, needsConfirm } = await signUp(email, password, fullName);
         if (error) {
-          setError(error);
+          setError(
+            /already registered|already exists/i.test(error)
+              ? 'This email is already registered. Switch to the Login tab to sign in.'
+              : error
+          );
         } else if (needsConfirm) {
           setDone(true);
           setInfo('Account created! Please check your email to confirm your address, then log in.');
