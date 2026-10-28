@@ -150,7 +150,7 @@ export const TREATMENT_IMAGES: Record<string, string> = {
 export const SERVICE_IMAGES: Record<string, string> = {
   // Dental Care (22)
   'Dental Apicoectomy': px(6629364),
-  'Dental Bridges & Crowns': px(6502340),
+  'Dental Bridges & Crowns': px(6627594),
   'Dental Cleanings (Prophylaxis)': px(20301626),
   'Dental Fillings (GIC & Composites)': px(6529216),
   'Dental Implants': px(6502305),
