@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, ChevronDown, ChevronRight, Menu, X, User, LogOut } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import type { TranslationKey } from '../i18n/translations';
 import { TREATMENT_NAMES } from '../i18n/dbTranslations';
+import { useAuth } from '../lib/AuthContext';
+import AuthModal from './AuthModal';
 
 const NAV_LINKS: { label: TranslationKey; slug: string | null }[] = [
   { label: 'about', slug: null },
@@ -226,6 +228,12 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
   const { t, tt } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user: authUser, signOut: authSignOut } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const authName =
+    (authUser?.user_metadata?.full_name as string | undefined)?.split(' ')[0] ||
+    authUser?.email?.split('@')[0] ||
+    '';
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [mobileMenu, setMobileMenu] = useState<string | null>(null);
@@ -674,15 +682,40 @@ export default function Navbar({ onBookAppointment, onNavigate, onNavigateTreatm
               );
             })}
           </nav>
+          {/* Login / account (mobile) */}
+          {authUser ? (
+            <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-white/10 px-4 py-2.5">
+              <span className="flex items-center gap-2 text-white text-sm min-w-0">
+                <User size={16} className="flex-shrink-0" />
+                <span className="truncate">Hi, {authName}</span>
+              </span>
+              <button
+                onClick={() => { authSignOut(); setMobileOpen(false); }}
+                className="flex items-center gap-1 text-white/80 hover:text-white text-sm whitespace-nowrap"
+              >
+                <LogOut size={15} /> Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setAuthOpen(true); setMobileOpen(false); }}
+              className="mt-3 w-full flex items-center justify-center gap-2 text-white text-sm font-semibold py-3 rounded-full border border-white/30 hover:bg-white/10 transition-colors"
+            >
+              <User size={16} /> {t('loginRegister')}
+            </button>
+          )}
+
           <button
             onClick={() => { onBookAppointment(); setMobileOpen(false); }}
-            className="mt-4 w-full text-white text-sm font-semibold py-3 rounded-full"
+            className="mt-3 w-full text-white text-sm font-semibold py-3 rounded-full"
             style={{ background: 'linear-gradient(135deg, #ca8a04 0%, #eab308 100%)' }}
           >
             {t('bookAppointment')}
           </button>
         </div>
       )}
+
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </header>
   );
 }
