@@ -1,6 +1,7 @@
 import { CheckCircle2 } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import type { TranslationKey } from '../i18n/translations';
+import CountUp from './CountUp';
 
 interface WhyChooseUsProps {
   onBookAppointment: () => void;
@@ -47,15 +48,15 @@ export default function WhyChooseUs({ onBookAppointment }: WhyChooseUsProps) {
             >
               <div className="flex gap-6 text-white">
                 <div>
-                  <p className="text-2xl font-extrabold">7+</p>
+                  <p className="text-2xl font-extrabold"><CountUp end={7} suffix="+" /></p>
                   <p className="text-xs text-purple-200 uppercase tracking-wide">{t('yearsExp')}</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-extrabold">17k+</p>
+                  <p className="text-2xl font-extrabold"><CountUp end={17} suffix="k+" /></p>
                   <p className="text-xs text-purple-200 uppercase tracking-wide">{t('patients')}</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-extrabold">33k+</p>
+                  <p className="text-2xl font-extrabold"><CountUp end={33} suffix="k+" /></p>
                   <p className="text-xs text-purple-200 uppercase tracking-wide">{t('treatments')}</p>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import { HERO_DESCRIPTION } from '../i18n/dbTranslations';
+import CountUp from './CountUp';
 
 interface HeroProps {
   onBookAppointment: () => void;
@@ -68,17 +69,17 @@ export default function Hero({ onBookAppointment, onExplore }: HeroProps) {
           {/* Stats */}
           <div className="flex items-center gap-6 md:gap-10">
             <div>
-              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none">7+</p>
+              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none"><CountUp end={7} suffix="+" /></p>
               <p className="text-purple-200/80 text-[11px] font-medium tracking-widest uppercase mt-1.5">{t('yearsExperience')}</p>
             </div>
             <div className="h-12 w-px bg-white/20" />
             <div>
-              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none">17k+</p>
+              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none"><CountUp end={17} suffix="k+" /></p>
               <p className="text-purple-200/80 text-[11px] font-medium tracking-widest uppercase mt-1.5">{t('happyPatients')}</p>
             </div>
             <div className="h-12 w-px bg-white/20" />
             <div>
-              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none">33k+</p>
+              <p className="text-white text-3xl md:text-4xl font-extrabold leading-none"><CountUp end={33} suffix="k+" /></p>
               <p className="text-purple-200/80 text-[11px] font-medium tracking-widest uppercase mt-1.5">{t('treatments')}</p>
             </div>
           </div>
