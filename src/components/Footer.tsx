@@ -36,6 +36,19 @@ const SERVICE_TREATMENT_NAMES: Record<string, string> = {
   'Laser Hair Removal':    'Laser Hair Removal',
 };
 
+// Some "Explore RootCosmo" labels are shortened and don't match a treatment in
+// the image map, so their detail page would fall back to the default photo.
+// Map each to its canonical name (which has its own distinct image).
+const EXPLORE_ALIASES: Record<string, string> = {
+  'Dental Cleanings': 'Dental Cleanings (Prophylaxis)',
+  'Dental Fillings':  'Dental Fillings (GIC & Composites)',
+  'Botox Injections': 'Botox (Botulinum Toxin) Injections',
+  'Carbon Peel':      'Carbon Laser Peel (Hollywood Peel)',
+  'Dark Circles':     'Under Eye Dark Circle Reduction',
+  'Crystal MDM':      'Crystal Microdermabrasion (MDM)',
+  'Oxygen Facial':    'Oxygeno Facial',
+};
+
 // Full service lists per category, mirroring rootcosmo.com's footer.
 const SERVICE_COLUMNS: { title: string; slug: string; items: string[] }[] = [
   { title: 'Dental', slug: 'dental-care', items: ['Apicoectomy', 'Dental Bridges & Crowns', 'Dental Cleanings', 'Dental Fillings', 'Dental Implants', 'Dental Sealants', 'Dental Veneers'] },
@@ -221,7 +234,7 @@ export default function Footer({ onNavigate, onNavigateTreatment, onHome }: Foot
                   {col.items.map((item) => (
                     <li key={item}>
                       <button
-                        onClick={() => onNavigateTreatment(item)}
+                        onClick={() => onNavigateTreatment(EXPLORE_ALIASES[item] ?? item)}
                         className="text-gray-400 text-xs hover:text-yellow-300 transition-colors text-left"
                       >
                         {item}
